@@ -205,6 +205,50 @@ function DeveloperPromo({ navigate }) {
   );
 }
 
+const faqs = [
+  { q: "Tizimga qanday kirish mumkin?", a: "Trener yoki futbolchi sifatida login va parolingiz bilan tizimga kirishingiz mumkin. Hisob yo'q bo'lsa, klub administratoriga murojaat qiling." },
+  { q: "Futbolchi o'z ma'lumotlarini ko'ra oladimi?", a: "Ha. Futbolchi o'z profilida davomat, mashg'ulotlar jadvalini va to'lov holatini real vaqtda ko'ra oladi." },
+  { q: "To'lovlar qanday nazorat qilinadi?", a: "Trener har bir futbolchining oylik to'lov holatini belgilaydi. Tizim avtomatik hisobot va qarzdorlik ro'yxatini ko'rsatadi." },
+  { q: "Bir nechta jamoa boshqarish mumkinmi?", a: "Ha. Trener bir nechta jamoani alohida boshqarishi, har bir jamoa uchun mashg'ulot va to'lovlarni sozlashi mumkin." },
+  { q: "Tizim mobil telefonda ishlaydi ham?", a: "Ha, tizim to'liq mobil qurilmalar uchun moslashtirilgan — telefon yoki planshetdan bemalol foydalanish mumkin." },
+];
+
+function FAQ() {
+  const [open, setOpen] = useState(null);
+  return (
+    <div className="relative z-10 px-6 pb-16 max-w-3xl mx-auto">
+      <p className="text-center text-xs text-slate-600 font-semibold uppercase tracking-widest mb-3">FAQ</p>
+      <h2 className="text-center text-white font-black text-2xl sm:text-3xl mb-8">
+        Tez-tez so'raladigan <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">savollar</span>
+      </h2>
+      <div className="flex flex-col gap-3">
+        {faqs.map((item, i) => (
+          <div
+            key={i}
+            className={`rounded-2xl border transition-all duration-300 overflow-hidden ${open === i ? 'border-blue-500/40 bg-blue-950/30' : 'border-white/[0.07] bg-white/[0.03] hover:border-white/[0.12]'}`}
+          >
+            <button
+              onClick={() => setOpen(open === i ? null : i)}
+              className="w-full flex items-center justify-between px-5 py-4 text-left gap-4"
+            >
+              <span className={`text-sm font-semibold transition-colors ${open === i ? 'text-blue-300' : 'text-slate-200'}`}>{item.q}</span>
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 border transition-all duration-300 ${open === i ? 'bg-blue-600 border-blue-500 rotate-45' : 'border-white/[0.15] bg-white/[0.05]'}`}>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <line x1="5" y1="1" x2="5" y2="9" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                  <line x1="1" y1="5" x2="9" y2="5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </div>
+            </button>
+            <div className={`transition-all duration-300 ${open === i ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+              <p className="px-5 pb-4 text-slate-400 text-sm leading-relaxed">{item.a}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Landing() {
   const navigate = useNavigate();
   const [v, setV] = useState(false);
@@ -359,11 +403,8 @@ export default function Landing() {
             className={`transition-all duration-700 delay-100 ${v ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
             style={{ animation: v ? 'float 3.5s ease-in-out infinite' : 'none' }}
           >
-            <div
-              className="w-32 h-32 rounded-3xl bg-white overflow-hidden p-2"
-              style={{ animation: v ? 'glow-pulse 3s ease-in-out infinite' : 'none' }}
-            >
-              <img src={logo} alt="logo" className="w-full h-full object-contain" />
+            <div style={{ animation: v ? 'glow-pulse 3s ease-in-out infinite' : 'none' }}>
+              <img src={logo} alt="logo" className="w-44 h-44 object-contain drop-shadow-2xl" />
             </div>
           </div>
 
@@ -491,6 +532,12 @@ export default function Landing() {
             ))}
           </div>
         </div>
+
+        {/* ── FAQ ── */}
+        <div className="relative z-10 mx-auto max-w-4xl px-6 mb-8">
+          <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
+        </div>
+        <FAQ />
 
         {/* ── Developer promo ── */}
         <DeveloperPromo navigate={navigate} />
