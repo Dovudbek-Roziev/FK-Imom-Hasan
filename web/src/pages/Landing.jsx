@@ -37,6 +37,13 @@ const translations = {
     devHighlight: 'tizim kerakmi?',
     devDesc: "Web ilovalar, Telegram botlar va mobil dizayn bo'yicha professional yechimlar taklif etaman.",
     devAll: 'Barcha loyihalarni ko\'rish →',
+    services: ['Web ilovalar', 'Telegram botlar', 'Mobil dizayn', 'Full-stack'],
+    projects: [
+      { name: 'FK-Imom-Hasan', desc: 'Futbol klub tizimi' },
+      { name: 'CVcraft', desc: 'CV yaratuvchi platforma' },
+      { name: 'Online-Kurs-KursHub', desc: "Online ta'lim platformasi" },
+      { name: 'Vibe', desc: 'Ijtimoiy tarmoq loyihasi' },
+    ],
     footerDesc: "Professional futbol klub boshqaruv tizimi. Trenerlar va futbolchilar uchun qulay platforma.",
     footerActive: 'Tizim faol',
     footerPages: 'Sahifalar',
@@ -80,6 +87,13 @@ const translations = {
     devHighlight: 'система?',
     devDesc: "Предлагаю профессиональные решения: веб-приложения, Telegram-боты и мобильный дизайн.",
     devAll: 'Посмотреть все проекты →',
+    services: ['Веб-приложения', 'Telegram-боты', 'Мобильный дизайн', 'Full-stack'],
+    projects: [
+      { name: 'FK-Imom-Hasan', desc: 'Система футбольного клуба' },
+      { name: 'CVcraft', desc: 'Платформа создания резюме' },
+      { name: 'Online-Kurs-KursHub', desc: 'Платформа онлайн-обучения' },
+      { name: 'Vibe', desc: 'Проект социальной сети' },
+    ],
     footerDesc: "Профессиональная система управления футбольным клубом. Удобная платформа для тренеров и игроков.",
     footerActive: 'Система активна',
     footerPages: 'Страницы',
@@ -160,19 +174,10 @@ function AnnouncementStrip({ t }) {
   );
 }
 
-const projects = [
-  { name: 'FK-Imom-Hasan', desc: 'Futbol klub tizimi', lang: 'JS', color: 'from-blue-500 to-cyan-500', stars: 3 },
-  { name: 'CVcraft', desc: 'CV yaratuvchi platforma', lang: 'JS', color: 'from-violet-500 to-purple-500', stars: 5 },
-  { name: 'Online-Kurs-KursHub', desc: 'Online ta\'lim platformasi', lang: 'JS', color: 'from-emerald-500 to-green-500', stars: 4 },
-  { name: 'Vibe', desc: 'Ijtimoiy tarmoq loyihasi', lang: 'JS', color: 'from-rose-500 to-pink-500', stars: 4 },
-];
-
-const services = [
-  { Icon: Globe, label: 'Web ilovalar', color: 'text-blue-400' },
-  { Icon: Bot, label: 'Telegram botlar', color: 'text-sky-400' },
-  { Icon: Smartphone, label: 'Mobil dizayn', color: 'text-violet-400' },
-  { Icon: Code2, label: 'Full-stack', color: 'text-emerald-400' },
-];
+const projectColors = ['from-blue-500 to-cyan-500', 'from-violet-500 to-purple-500', 'from-emerald-500 to-green-500', 'from-rose-500 to-pink-500'];
+const projectStars = [3, 5, 4, 4];
+const serviceIcons = [Globe, Bot, Smartphone, Code2];
+const serviceColors = ['text-blue-400', 'text-sky-400', 'text-violet-400', 'text-emerald-400'];
 
 function DeveloperPromo({ navigate, t, dark }) {
   return (
@@ -202,12 +207,15 @@ function DeveloperPromo({ navigate, t, dark }) {
 
               {/* Services */}
               <div className="flex flex-col gap-2 w-full">
-                {services.map(({ Icon, label, color }) => (
-                  <div key={label} className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.06]">
-                    <Icon size={13} className={color} />
-                    <span className="text-slate-400 text-xs">{label}</span>
-                  </div>
-                ))}
+                {t.services.map((label, i) => {
+                  const Icon = serviceIcons[i];
+                  return (
+                    <div key={i} className={`flex items-center gap-2.5 px-3 py-1.5 rounded-xl border ${dark ? 'bg-white/[0.04] border-white/[0.06]' : 'bg-slate-50 border-slate-200'}`}>
+                      <Icon size={13} className={serviceColors[i]} />
+                      <span className={`text-xs ${dark ? 'text-slate-400' : 'text-slate-600'}`}>{label}</span>
+                    </div>
+                  );
+                })}
               </div>
 
               {/* CTA buttons */}
@@ -247,7 +255,7 @@ function DeveloperPromo({ navigate, t, dark }) {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {projects.map(({ name, desc, lang, color, stars }) => (
+                {t.projects.map(({ name, desc }, i) => (
                   <a
                     key={name}
                     href={`https://github.com/Dovudbek-Roziev/${name}`}
@@ -255,19 +263,19 @@ function DeveloperPromo({ navigate, t, dark }) {
                     rel="noopener noreferrer"
                     className={`proj-card rounded-xl p-3 group border ${dark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}
                   >
-                    <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center mb-2`}>
+                    <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${projectColors[i]} flex items-center justify-center mb-2`}>
                       <Code2 size={13} className="text-white" />
                     </div>
-                    <p className="text-white text-xs font-semibold truncate group-hover:text-blue-400 transition-colors flex items-center gap-1">
+                    <p className={`text-xs font-semibold truncate group-hover:text-blue-400 transition-colors flex items-center gap-1 ${dark ? 'text-white' : 'text-slate-700'}`}>
                       {name.length > 14 ? name.slice(0, 14) + '…' : name}
                       <ExternalLink size={9} className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                     </p>
-                    <p className="text-slate-600 text-[10px] mt-0.5 truncate">{desc}</p>
+                    <p className="text-slate-500 text-[10px] mt-0.5 truncate">{desc}</p>
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="text-[10px] text-slate-600 flex items-center gap-1">
-                        <Star size={9} className="text-yellow-500" fill="currentColor" /> {stars}
+                      <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                        <Star size={9} className="text-yellow-500" fill="currentColor" /> {projectStars[i]}
                       </span>
-                      <span className="text-[10px] text-yellow-400/70">{lang}</span>
+                      <span className="text-[10px] text-yellow-500/70">JS</span>
                     </div>
                   </a>
                 ))}
