@@ -2,22 +2,26 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/photo_2026-05-24_11-50-47-removebg-preview.png';
+import {
+  LayoutDashboard, Users, Shield, Dumbbell, CreditCard,
+  BarChart2, Star, Settings, User, Calendar, Wallet, LogOut
+} from 'lucide-react';
 
 const coachNav = [
-  { to: '/dashboard', label: 'Bosh sahifa', icon: '📊' },
-  { to: '/players', label: 'Futbolchilar', icon: '👥' },
-  { to: '/teams', label: 'Jamoalar', icon: '🏃' },
-  { to: '/trainings', label: 'Mashg\'ulotlar', icon: '⚽' },
-  { to: '/payments', label: 'To\'lovlar', icon: '💰' },
-  { to: '/stats', label: 'Statistika', icon: '📈' },
-  { to: '/subscription', label: 'Obuna', icon: '⭐' },
-  { to: '/profile', label: 'Profil', icon: '⚙️' },
+  { to: '/dashboard', label: 'Bosh sahifa', icon: LayoutDashboard },
+  { to: '/players', label: 'Futbolchilar', icon: Users },
+  { to: '/teams', label: 'Jamoalar', icon: Shield },
+  { to: '/trainings', label: 'Mashg\'ulotlar', icon: Dumbbell },
+  { to: '/payments', label: 'To\'lovlar', icon: CreditCard },
+  { to: '/stats', label: 'Statistika', icon: BarChart2 },
+  { to: '/subscription', label: 'Obuna', icon: Star },
+  { to: '/profile', label: 'Profil', icon: Settings },
 ];
 
 const playerNav = [
-  { to: '/player/home', label: 'Profilim', icon: '👤' },
-  { to: '/player/trainings', label: 'Mashg\'ulotlar', icon: '⚽' },
-  { to: '/player/payment', label: 'To\'lovlar', icon: '💰' },
+  { to: '/player/home', label: 'Profilim', icon: User },
+  { to: '/player/trainings', label: 'Mashg\'ulotlar', icon: Calendar },
+  { to: '/player/payment', label: 'To\'lovlar', icon: Wallet },
 ];
 
 export default function Layout({ children }) {
@@ -61,7 +65,7 @@ export default function Layout({ children }) {
               }`
             }
           >
-            <span>{item.icon}</span>
+            <item.icon size={18} strokeWidth={1.75} />
             {item.label}
           </NavLink>
         ))}
@@ -82,7 +86,7 @@ export default function Layout({ children }) {
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
         >
-          <span>🚪</span>
+          <LogOut size={18} strokeWidth={1.75} />
           Chiqish
         </button>
       </div>

@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import api, { photoUrl } from '../../api';
+import { Users, Calendar, TrendingUp, AlertCircle, Dumbbell, Trophy } from 'lucide-react';
 
 const MONTHS = ['', 'Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyn', 'Iyl', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek'];
 
-function StatCard({ icon, label, value, color }) {
+function StatCard({ Icon, label, value, color, iconColor }) {
   return (
     <div className="bg-white rounded-2xl p-5 shadow-sm">
       <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl mb-3 ${color}`}>
-        <span className="text-xl">{icon}</span>
+        <Icon size={20} strokeWidth={1.75} className={iconColor} />
       </div>
       <p className="text-sm text-slate-500 mb-1">{label}</p>
       <p className="text-2xl font-bold text-slate-800">{value ?? '—'}</p>
@@ -63,10 +64,10 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon="👥" label="Futbolchilar" value={stats?.totalPlayers} color="bg-blue-100" />
-        <StatCard icon="⚽" label="Bugungi mashg'ulot" value={stats?.todayTraining ? 'Bor' : "Yo'q"} color="bg-green-100" />
-        <StatCard icon="💰" label="Oylik daromad" value={stats?.totalIncome ? stats.totalIncome.toLocaleString() + " so'm" : '0'} color="bg-emerald-100" />
-        <StatCard icon="⏳" label="Qarzdorlar" value={stats?.debtorCount ?? 0} color="bg-orange-100" />
+        <StatCard Icon={Users} label="Futbolchilar" value={stats?.totalPlayers} color="bg-blue-100" iconColor="text-blue-600" />
+        <StatCard Icon={Calendar} label="Bugungi mashg'ulot" value={stats?.todayTraining ? 'Bor' : "Yo'q"} color="bg-green-100" iconColor="text-green-600" />
+        <StatCard Icon={TrendingUp} label="Oylik daromad" value={stats?.totalIncome ? stats.totalIncome.toLocaleString() + " so'm" : '0'} color="bg-emerald-100" iconColor="text-emerald-600" />
+        <StatCard Icon={AlertCircle} label="Qarzdorlar" value={stats?.debtorCount ?? 0} color="bg-orange-100" iconColor="text-orange-600" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -95,7 +96,9 @@ export default function Dashboard() {
             <div className="space-y-3">
               {recentTrainings.map((t) => (
                 <div key={t._id} className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-lg flex-shrink-0">⚽</div>
+                  <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                    <Dumbbell size={18} strokeWidth={1.75} className="text-blue-600" />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-800 truncate">{t.title}</p>
                     <p className="text-xs text-slate-500">{t.date ? new Date(t.date).toLocaleDateString('uz-UZ') : '—'}</p>
@@ -121,7 +124,9 @@ export default function Dashboard() {
       {/* Top o'yinchilar */}
       {topPlayers.length > 0 && (
         <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h2 className="text-sm font-semibold text-slate-700 mb-4">🏆 Top o'yinchilar</h2>
+          <h2 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+            <Trophy size={16} strokeWidth={1.75} className="text-yellow-500" /> Top o'yinchilar
+          </h2>
           <div className="space-y-3">
             {topPlayers.map((p, idx) => {
               const score = (p.stats?.goals || 0) * 2 + (p.stats?.assists || 0) + (p.stats?.trainingsAttended || 0);

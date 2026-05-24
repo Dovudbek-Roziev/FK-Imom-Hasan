@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import api, { photoUrl } from '../../api';
+import { CalendarDays, CheckCircle2, Target, Zap, Trophy } from 'lucide-react';
 
 const healthColors = {
   healthy: 'bg-green-100 text-green-700',
@@ -113,13 +114,15 @@ export default function PlayerHome() {
           {/* Statistika kartalar */}
           <div className="grid grid-cols-4 gap-1.5">
             {[
-              { label: 'Trening', value: stats?.totalTrainings ?? 0, icon: '📅' },
-              { label: 'Qatnashdi', value: stats?.trainingsAttended ?? 0, icon: '✅' },
-              { label: 'Gol', value: stats?.goals ?? 0, icon: '⚽' },
-              { label: 'Assist', value: stats?.assists ?? 0, icon: '🎯' },
-            ].map(({ label, value, icon }) => (
+              { label: 'Trening', value: stats?.totalTrainings ?? 0, Icon: CalendarDays, color: 'text-blue-500' },
+              { label: 'Qatnashdi', value: stats?.trainingsAttended ?? 0, Icon: CheckCircle2, color: 'text-green-500' },
+              { label: 'Gol', value: stats?.goals ?? 0, Icon: Target, color: 'text-orange-500' },
+              { label: 'Assist', value: stats?.assists ?? 0, Icon: Zap, color: 'text-purple-500' },
+            ].map(({ label, value, Icon, color }) => (
               <div key={label} className="bg-white rounded-xl p-2.5 shadow-sm text-center">
-                <div className="text-lg mb-1">{icon}</div>
+                <div className="flex justify-center mb-1">
+                  <Icon size={18} strokeWidth={1.75} className={color} />
+                </div>
                 <p className="text-lg font-bold text-slate-800">{value}</p>
                 <p className="text-xs text-slate-400 mt-0.5 leading-tight">{label}</p>
               </div>
@@ -182,7 +185,9 @@ export default function PlayerHome() {
           {/* Top o'yinchilar */}
           {topPlayers.length > 0 && (
             <div className="bg-white rounded-2xl p-5 shadow-sm">
-              <h3 className="text-sm font-semibold text-slate-700 mb-4">🏆 Top o'yinchilar</h3>
+              <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                <Trophy size={16} strokeWidth={1.75} className="text-yellow-500" /> Top o'yinchilar
+              </h3>
               <div className="space-y-3">
                 {topPlayers.map((pl, idx) => {
                   const score = (pl.stats?.goals || 0) * 2 + (pl.stats?.assists || 0) + (pl.stats?.trainingsAttended || 0);

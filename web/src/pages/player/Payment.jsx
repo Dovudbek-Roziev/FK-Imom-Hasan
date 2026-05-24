@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api';
+import { CreditCard, MessageCircle, Banknote, Copy, Check, Clock } from 'lucide-react';
 
 const MONTHS_UZ = ['', 'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'];
 
@@ -112,7 +113,9 @@ export default function PlayerPayment() {
 
           {currentPayment.status !== 'tolangan' && currentPayment.notes === 'player_notified' && (
             <div className="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
-              <p className="text-sm font-semibold text-amber-700">⏳ Tasdiqlash kutilmoqda</p>
+              <p className="text-sm font-semibold text-amber-700 flex items-center gap-2">
+                <Clock size={15} strokeWidth={2} /> Tasdiqlash kutilmoqda
+              </p>
               <p className="text-xs text-amber-600 mt-1">Trenerga xabar yuborildi. Trener tasdiqlashini kuting.</p>
             </div>
           )}
@@ -129,7 +132,7 @@ export default function PlayerPayment() {
                     className="w-full flex items-center justify-between px-4 py-3 bg-blue-600 text-white rounded-xl font-medium text-sm hover:bg-blue-700 transition-colors"
                   >
                     <span>Karta orqali to'lash</span>
-                    <span className="text-lg">💳</span>
+                    <CreditCard size={18} strokeWidth={1.75} />
                   </button>
 
                   {showCard && (
@@ -140,9 +143,9 @@ export default function PlayerPayment() {
                           <p className="text-xl font-mono font-bold text-slate-800 tracking-wider flex-1">{coachInfo.cardNumber}</p>
                           <button
                             onClick={handleCopy}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${copied ? 'bg-green-500 text-white' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${copied ? 'bg-green-500 text-white' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'}`}
                           >
-                            {copied ? 'Nusxa olindi!' : 'Nusxa olish'}
+                            {copied ? <><Check size={13} strokeWidth={2.5} /> Nusxa olindi!</> : <><Copy size={13} strokeWidth={2} /> Nusxa olish</>}
                           </button>
                         </div>
                       </div>
@@ -169,13 +172,13 @@ export default function PlayerPayment() {
                   className="w-full flex items-center justify-between px-4 py-3 bg-green-500 text-white rounded-xl font-medium text-sm hover:bg-green-600 transition-colors"
                 >
                   <span>WhatsApp orqali xabar berish</span>
-                  <span className="text-lg">💬</span>
+                  <MessageCircle size={18} strokeWidth={1.75} />
                 </button>
               )}
 
               {/* Naqt */}
               <div className="flex items-center gap-3 px-4 py-3 bg-slate-100 rounded-xl text-sm text-slate-600">
-                <span className="text-lg">💵</span>
+                <Banknote size={18} strokeWidth={1.75} className="text-slate-500 flex-shrink-0" />
                 <span>Naqt to'lash uchun treneringiz bilan to'g'ridan-to'g'ri bog'laning</span>
               </div>
 

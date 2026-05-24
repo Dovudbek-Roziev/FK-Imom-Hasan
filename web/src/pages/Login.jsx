@@ -4,11 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api';
 import adminApi from '../api/adminApi';
 import logo from '../assets/photo_2026-05-24_11-50-47-removebg-preview.png';
+import { UserCog, Users, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 const TABS = [
-  { id: 'coach', label: 'Trener', icon: '🎯' },
-  { id: 'player', label: 'Futbolchi', icon: '⚽' },
-  { id: 'admin', label: 'Admin', icon: '🔐' },
+  { id: 'coach', label: 'Trener', Icon: UserCog },
+  { id: 'player', label: 'Futbolchi', Icon: Users },
+  { id: 'admin', label: 'Admin', Icon: Lock },
 ];
 
 export default function Login() {
@@ -92,13 +93,13 @@ export default function Login() {
               <button
                 key={t.id}
                 onClick={() => switchTab(t.id)}
-                className={`flex-1 py-4 text-xs font-semibold transition-all flex flex-col items-center gap-1 ${
+                className={`flex-1 py-4 text-xs font-semibold transition-all flex flex-col items-center gap-1.5 ${
                   tab === t.id
                     ? 'bg-white text-blue-600 shadow-sm border-b-2 border-blue-600'
                     : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                <span className="text-base">{t.icon}</span>
+                <t.Icon size={18} strokeWidth={1.75} />
                 {t.label}
               </button>
             ))}
@@ -108,7 +109,7 @@ export default function Login() {
           <div className="p-7">
             {error && (
               <div className="mb-5 p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm flex items-center gap-2">
-                <span>⚠️</span> {error}
+                <AlertCircle size={16} strokeWidth={2} className="flex-shrink-0" /> {error}
               </div>
             )}
 
@@ -139,9 +140,9 @@ export default function Login() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-sm px-1"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
                     >
-                      {showPassword ? '🙈' : '👁️'}
+                      {showPassword ? <EyeOff size={18} strokeWidth={1.75} /> : <Eye size={18} strokeWidth={1.75} />}
                     </button>
                   </div>
                 </div>
@@ -163,7 +164,9 @@ export default function Login() {
             {tab === 'player' && (
               <form onSubmit={handlePlayerLogin} className="space-y-4">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">⚽</div>
+                  <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Users size={32} strokeWidth={1.5} className="text-blue-600" />
+                  </div>
                   <p className="text-sm text-slate-500 mb-4">Treneringiz bergan 6 xonali kodni kiriting</p>
                 </div>
                 <div>
@@ -196,7 +199,9 @@ export default function Login() {
             {tab === 'admin' && (
               <form onSubmit={handleAdminLogin} className="space-y-4">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔐</div>
+                  <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Lock size={32} strokeWidth={1.5} className="text-slate-600" />
+                  </div>
                   <p className="text-sm text-slate-500 mb-4">Faqat tizim administratori uchun</p>
                 </div>
                 <div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api, { photoUrl } from '../../api';
+import { LogOut } from 'lucide-react';
 
 const planLabels = { free: 'Bepul (30 ta limit)', premium_5: 'Premium $5', premium_10: 'Premium Pro $10' };
 
@@ -261,9 +262,9 @@ export default function CoachProfile() {
       {/* Logout */}
       <button
         onClick={handleLogout}
-        className="w-full py-3 rounded-2xl border border-red-200 text-red-600 font-medium text-sm hover:bg-red-50 transition-colors"
+        className="w-full py-3 rounded-2xl border border-red-200 text-red-600 font-medium text-sm hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
       >
-        🚪 Chiqish
+        <LogOut size={16} strokeWidth={1.75} /> Chiqish
       </button>
     </div>
   );
