@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/photo_2026-05-24_11-50-47-removebg-preview.png';
-import { Users, Dumbbell, CreditCard, Trophy, LogIn, Settings, TrendingUp, Phone, MapPin, ChevronRight, Send } from 'lucide-react';
+import { Users, Dumbbell, CreditCard, Trophy, LogIn, Settings, TrendingUp, Phone, MapPin, ChevronRight, Send, Code2, Globe, Bot, Smartphone, Star, ExternalLink, X } from 'lucide-react';
 
 function Counter({ target, suffix = '' }) {
   const [count, setCount] = useState(0);
@@ -51,6 +51,159 @@ const features = [
     glow: 'shadow-violet-500/30',
   },
 ];
+
+function AnnouncementStrip() {
+  const [open, setOpen] = useState(true);
+  if (!open) return null;
+  const msg = '⚡ FK Imom Hasan 2026 — Yangi mavsum boshlandi! · Trenerlar va futbolchilar uchun professional boshqaruv tizimi · ';
+  return (
+    <div className="relative z-20 bg-gradient-to-r from-blue-700 via-violet-700 to-blue-700 overflow-hidden">
+      <div className="flex overflow-hidden py-2 px-0">
+        <div className="marquee-track flex whitespace-nowrap">
+          {[...Array(4)].map((_, i) => (
+            <span key={i} className="text-white text-xs font-medium px-6 opacity-90">{msg}</span>
+          ))}
+        </div>
+      </div>
+      <button
+        onClick={() => setOpen(false)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
+      >
+        <X size={14} />
+      </button>
+    </div>
+  );
+}
+
+const projects = [
+  { name: 'FK-Imom-Hasan', desc: 'Futbol klub tizimi', lang: 'JS', color: 'from-blue-500 to-cyan-500', stars: 3 },
+  { name: 'CVcraft', desc: 'CV yaratuvchi platforma', lang: 'JS', color: 'from-violet-500 to-purple-500', stars: 5 },
+  { name: 'Online-Kurs-KursHub', desc: 'Online ta\'lim platformasi', lang: 'JS', color: 'from-emerald-500 to-green-500', stars: 4 },
+  { name: 'Vibe', desc: 'Ijtimoiy tarmoq loyihasi', lang: 'JS', color: 'from-rose-500 to-pink-500', stars: 4 },
+];
+
+const services = [
+  { Icon: Globe, label: 'Web ilovalar', color: 'text-blue-400' },
+  { Icon: Bot, label: 'Telegram botlar', color: 'text-sky-400' },
+  { Icon: Smartphone, label: 'Mobil dizayn', color: 'text-violet-400' },
+  { Icon: Code2, label: 'Full-stack', color: 'text-emerald-400' },
+];
+
+function DeveloperPromo({ navigate }) {
+  return (
+    <div className="relative z-10 px-6 py-16 max-w-4xl mx-auto">
+      <div className="relative p-px rounded-3xl dev-card-border">
+        <div className="bg-slate-950 rounded-3xl p-8 sm:p-10 overflow-hidden relative">
+
+          {/* bg decoration */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-violet-700/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-60 h-60 bg-blue-700/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative flex flex-col sm:flex-row gap-8 sm:gap-10">
+
+            {/* Left: profile */}
+            <div className="flex flex-col items-center sm:items-start gap-5 sm:w-56 flex-shrink-0">
+              {/* Avatar */}
+              <div className="avatar-glow w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500 via-violet-500 to-purple-600 flex items-center justify-center shadow-2xl flex-shrink-0">
+                <span className="text-white font-black text-3xl tracking-tight">DR</span>
+              </div>
+
+              <div className="text-center sm:text-left">
+                <p className="text-white font-black text-xl leading-tight">Dovudbek</p>
+                <p className="text-white font-black text-xl leading-tight">Roziev</p>
+                <p className="text-blue-400 text-xs font-semibold mt-1.5 tracking-wide">Full-stack Developer</p>
+                <p className="text-slate-500 text-xs mt-1">Osh, Qirg'iziston 🇰🇬</p>
+              </div>
+
+              {/* Services */}
+              <div className="flex flex-col gap-2 w-full">
+                {services.map(({ Icon, label, color }) => (
+                  <div key={label} className="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/[0.06]">
+                    <Icon size={13} className={color} />
+                    <span className="text-slate-400 text-xs">{label}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA buttons */}
+              <div className="flex gap-2 flex-wrap justify-center sm:justify-start">
+                <a
+                  href="https://instagram.com/roz1ev.db"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 text-white text-xs font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-pink-900/40"
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+                  Instagram
+                </a>
+                <a
+                  href="https://t.me/dovud_IT"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-500 text-white text-xs font-semibold hover:opacity-90 transition-opacity shadow-lg shadow-sky-900/40"
+                >
+                  <Send size={11} />
+                  Telegram
+                </a>
+              </div>
+            </div>
+
+            {/* Right: projects */}
+            <div className="flex-1 flex flex-col gap-4">
+              <div>
+                <p className="text-[10px] text-slate-600 font-semibold uppercase tracking-widest mb-1">Portfolio</p>
+                <h3 className="text-white font-black text-lg sm:text-2xl leading-tight">
+                  Sizga ham shunday<br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">tizim kerakmi?</span>
+                </h3>
+                <p className="text-slate-500 text-xs mt-2 leading-relaxed max-w-sm">
+                  Web ilovalar, Telegram botlar va mobil dizayn bo'yicha professional yechimlar taklif etaman.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5">
+                {projects.map(({ name, desc, lang, color, stars }) => (
+                  <a
+                    key={name}
+                    href={`https://github.com/Dovudbek-Roziev/${name}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="proj-card bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 group"
+                  >
+                    <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center mb-2`}>
+                      <Code2 size={13} className="text-white" />
+                    </div>
+                    <p className="text-white text-xs font-semibold truncate group-hover:text-blue-400 transition-colors flex items-center gap-1">
+                      {name.length > 14 ? name.slice(0, 14) + '…' : name}
+                      <ExternalLink size={9} className="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                    </p>
+                    <p className="text-slate-600 text-[10px] mt-0.5 truncate">{desc}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-[10px] text-slate-600 flex items-center gap-1">
+                        <Star size={9} className="text-yellow-500" fill="currentColor" /> {stars}
+                      </span>
+                      <span className="text-[10px] text-yellow-400/70">{lang}</span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+
+              <a
+                href="https://github.com/Dovudbek-Roziev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/[0.08] text-slate-400 text-xs hover:text-white hover:border-white/20 hover:bg-white/[0.04] transition-all"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                Barcha loyihalarni ko'rish →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -116,6 +269,40 @@ export default function Landing() {
         .step-card:hover .step-num {
           transform: scale(1.15);
         }
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .marquee-track {
+          animation: marquee 18s linear infinite;
+        }
+        .marquee-track:hover {
+          animation-play-state: paused;
+        }
+        @keyframes border-spin {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .dev-card-border {
+          background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4, #8b5cf6, #3b82f6);
+          background-size: 300% 300%;
+          animation: border-spin 4s ease infinite;
+        }
+        @keyframes avatar-glow {
+          0%, 100% { box-shadow: 0 0 20px 4px rgba(139,92,246,0.4); }
+          50% { box-shadow: 0 0 40px 10px rgba(59,130,246,0.5); }
+        }
+        .avatar-glow {
+          animation: avatar-glow 3s ease-in-out infinite;
+        }
+        .proj-card {
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .proj-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 30px -8px rgba(99,102,241,0.3);
+        }
       `}</style>
 
       <div className="min-h-screen bg-slate-950 relative overflow-hidden">
@@ -146,6 +333,9 @@ export default function Landing() {
         {/* ── Decorative blobs ── */}
         <div className="absolute top-[-80px] left-[-80px] w-64 h-64 bg-blue-700/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-[-60px] right-[-60px] w-64 h-64 bg-violet-700/15 rounded-full blur-3xl pointer-events-none" />
+
+        {/* ── Announcement strip ── */}
+        <AnnouncementStrip />
 
         {/* ── Top nav bar ── */}
         <div className={`relative z-10 flex items-center justify-between px-6 sm:px-10 py-5 transition-all duration-700 ${v ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
@@ -301,6 +491,9 @@ export default function Landing() {
             ))}
           </div>
         </div>
+
+        {/* ── Developer promo ── */}
+        <DeveloperPromo navigate={navigate} />
 
         {/* ── Footer ── */}
         <footer className="relative z-10 border-t border-white/[0.06]">
