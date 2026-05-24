@@ -1,7 +1,96 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/photo_2026-05-24_11-50-47-removebg-preview.png';
-import { Users, Dumbbell, CreditCard, Trophy, LogIn, Settings, TrendingUp, Phone, MapPin, ChevronRight, Send, Code2, Globe, Bot, Smartphone, Star, ExternalLink, X } from 'lucide-react';
+import { Users, Dumbbell, CreditCard, Trophy, LogIn, Settings, TrendingUp, Phone, MapPin, ChevronRight, Send, Code2, Globe, Bot, Smartphone, Star, ExternalLink, X, Sun, Moon } from 'lucide-react';
+
+const translations = {
+  uz: {
+    navTitle: 'FK Imom Hasan',
+    login: 'Kirish →',
+    heroTitle: 'FK Imom Hasan',
+    heroDesc: "Professional futbol klub boshqaruv tizimi — trenerlar, futbolchilar va to'lovlarni bir joyda boshqaring",
+    cta: 'Tizimga kirish',
+    ctaSub: 'Professional boshqaruv',
+    statLabels: ['Futbolchi', "Mashg'ulot", 'Trener'],
+    featuresTitle: 'Imkoniyatlar',
+    features: [
+      { title: 'Futbolchilar', desc: "Barcha futbolchilarni bir joyda boshqaring, statistika va rivojlanishni kuzating" },
+      { title: "Mashg'ulotlar", desc: "Mashg'ulot jadvalini tuzing, davomat va ko'rsatkichlarni real vaqtda hisoblab boring" },
+      { title: "To'lovlar", desc: "Oylik to'lovlarni kuzating, qarzdorlikni nazorat qiling va hisobotlar oling" },
+    ],
+    guideTitle: "Qo'llanma",
+    steps: [
+      { num: '01', title: 'Kiring', desc: 'Trener yoki futbolchi sifatida tizimga kiring' },
+      { num: '02', title: 'Sozlang', desc: "Jamoangizni tuzing, mashg'ulotlar va to'lovlarni belgilang" },
+      { num: '03', title: 'Kuzating', desc: 'Statistika, davomat va moliyani real vaqtda nazorat qiling' },
+    ],
+    faqTitle: 'Tez-tez so\'raladigan',
+    faqHighlight: 'savollar',
+    faqs: [
+      { q: "Tizimga qanday kirish mumkin?", a: "Trener yoki futbolchi sifatida login va parolingiz bilan tizimga kirishingiz mumkin. Hisob yo'q bo'lsa, klub administratoriga murojaat qiling." },
+      { q: "Futbolchi o'z ma'lumotlarini ko'ra oladimi?", a: "Ha. Futbolchi o'z profilida davomat, mashg'ulotlar jadvalini va to'lov holatini real vaqtda ko'ra oladi." },
+      { q: "To'lovlar qanday nazorat qilinadi?", a: "Trener har bir futbolchining oylik to'lov holatini belgilaydi. Tizim avtomatik hisobot va qarzdorlik ro'yxatini ko'rsatadi." },
+      { q: "Bir nechta jamoa boshqarish mumkinmi?", a: "Ha. Trener bir nechta jamoani alohida boshqarishi, har bir jamoa uchun mashg'ulot va to'lovlarni sozlashi mumkin." },
+      { q: "Tizim mobil telefonda ishlaydi ham?", a: "Ha, tizim to'liq mobil qurilmalar uchun moslashtirilgan — telefon yoki planshetdan bemalol foydalanish mumkin." },
+    ],
+    devTitle: 'Sizga ham shunday',
+    devHighlight: 'tizim kerakmi?',
+    devDesc: "Web ilovalar, Telegram botlar va mobil dizayn bo'yicha professional yechimlar taklif etaman.",
+    devAll: 'Barcha loyihalarni ko\'rish →',
+    footerDesc: "Professional futbol klub boshqaruv tizimi. Trenerlar va futbolchilar uchun qulay platforma.",
+    footerActive: 'Tizim faol',
+    footerPages: 'Sahifalar',
+    footerLinks: ['Trener paneli', 'Futbolchi paneli', "Mashg'ulotlar", "To'lovlar"],
+    footerContact: 'Aloqa',
+    footerCopy: '© 2026 FK Imom Hasan. Barcha huquqlar himoyalangan.',
+    footerDev: 'Dasturchi:',
+    strip: "⚡ FK Imom Hasan 2026 — Yangi mavsum boshlandi! · Trenerlar va futbolchilar uchun professional boshqaruv tizimi · ",
+    allRights: 'Barcha huquqlar himoyalangan.',
+  },
+  ru: {
+    navTitle: 'ФК Имом Хасан',
+    login: 'Войти →',
+    heroTitle: 'FK Imom Hasan',
+    heroDesc: "Профессиональная система управления футбольным клубом — тренеры, игроки и платежи в одном месте",
+    cta: 'Войти в систему',
+    ctaSub: 'Профессиональное управление',
+    statLabels: ['Игроков', 'Тренировок', 'Тренеров'],
+    featuresTitle: 'Возможности',
+    features: [
+      { title: 'Игроки', desc: "Управляйте всеми игроками в одном месте, отслеживайте статистику и прогресс" },
+      { title: 'Тренировки', desc: "Составляйте расписание тренировок, учитывайте посещаемость и показатели в реальном времени" },
+      { title: 'Платежи', desc: "Отслеживайте ежемесячные платежи, контролируйте задолженности и получайте отчёты" },
+    ],
+    guideTitle: 'Руководство',
+    steps: [
+      { num: '01', title: 'Войдите', desc: 'Войдите в систему как тренер или игрок' },
+      { num: '02', title: 'Настройте', desc: 'Создайте команду, настройте тренировки и платежи' },
+      { num: '03', title: 'Следите', desc: 'Контролируйте статистику, посещаемость и финансы в реальном времени' },
+    ],
+    faqTitle: 'Часто задаваемые',
+    faqHighlight: 'вопросы',
+    faqs: [
+      { q: "Как войти в систему?", a: "Войдите в систему с логином и паролем как тренер или игрок. Если аккаунта нет — обратитесь к администратору клуба." },
+      { q: "Может ли игрок видеть свои данные?", a: "Да. Игрок может видеть свою посещаемость, расписание тренировок и статус оплаты в реальном времени." },
+      { q: "Как контролируются платежи?", a: "Тренер устанавливает статус ежемесячного платежа для каждого игрока. Система автоматически показывает отчёты и список должников." },
+      { q: "Можно ли управлять несколькими командами?", a: "Да. Тренер может управлять несколькими командами отдельно, настраивая тренировки и платежи для каждой." },
+      { q: "Работает ли система на мобильном?", a: "Да, система полностью адаптирована для мобильных устройств — удобно пользоваться с телефона или планшета." },
+    ],
+    devTitle: 'Нужна такая же',
+    devHighlight: 'система?',
+    devDesc: "Предлагаю профессиональные решения: веб-приложения, Telegram-боты и мобильный дизайн.",
+    devAll: 'Посмотреть все проекты →',
+    footerDesc: "Профессиональная система управления футбольным клубом. Удобная платформа для тренеров и игроков.",
+    footerActive: 'Система активна',
+    footerPages: 'Страницы',
+    footerLinks: ['Панель тренера', 'Панель игрока', 'Тренировки', 'Платежи'],
+    footerContact: 'Контакты',
+    footerCopy: '© 2026 FK Imom Hasan. Все права защищены.',
+    footerDev: 'Разработчик:',
+    strip: "⚡ FK Imom Hasan 2026 — Новый сезон начался! · Профессиональная система управления для тренеров и игроков · ",
+    allRights: 'Все права защищены.',
+  },
+};
 
 function Counter({ target, suffix = '' }) {
   const [count, setCount] = useState(0);
@@ -52,23 +141,19 @@ const features = [
   },
 ];
 
-function AnnouncementStrip() {
+function AnnouncementStrip({ t }) {
   const [open, setOpen] = useState(true);
   if (!open) return null;
-  const msg = '⚡ FK Imom Hasan 2026 — Yangi mavsum boshlandi! · Trenerlar va futbolchilar uchun professional boshqaruv tizimi · ';
   return (
     <div className="relative z-20 bg-gradient-to-r from-blue-700 via-violet-700 to-blue-700 overflow-hidden">
       <div className="flex overflow-hidden py-2 px-0">
         <div className="marquee-track flex whitespace-nowrap">
           {[...Array(4)].map((_, i) => (
-            <span key={i} className="text-white text-xs font-medium px-6 opacity-90">{msg}</span>
+            <span key={i} className="text-white text-xs font-medium px-6 opacity-90">{t.strip}</span>
           ))}
         </div>
       </div>
-      <button
-        onClick={() => setOpen(false)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
-      >
+      <button onClick={() => setOpen(false)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors">
         <X size={14} />
       </button>
     </div>
@@ -89,11 +174,11 @@ const services = [
   { Icon: Code2, label: 'Full-stack', color: 'text-emerald-400' },
 ];
 
-function DeveloperPromo({ navigate }) {
+function DeveloperPromo({ navigate, t, dark }) {
   return (
     <div className="relative z-10 px-4 sm:px-6 py-10 sm:py-16 max-w-4xl mx-auto">
       <div className="relative p-px rounded-2xl sm:rounded-3xl dev-card-border">
-        <div className="bg-slate-950 rounded-2xl sm:rounded-3xl p-5 sm:p-10 overflow-hidden relative">
+        <div className={`rounded-2xl sm:rounded-3xl p-5 sm:p-10 overflow-hidden relative ${dark ? 'bg-slate-950' : 'bg-white'}`}>
 
           {/* bg decoration */}
           <div className="absolute top-0 right-0 w-80 h-80 bg-violet-700/10 rounded-full blur-3xl pointer-events-none" />
@@ -152,12 +237,12 @@ function DeveloperPromo({ navigate }) {
             <div className="flex-1 flex flex-col gap-4">
               <div>
                 <p className="text-[10px] text-slate-600 font-semibold uppercase tracking-widest mb-1">Portfolio</p>
-                <h3 className="text-white font-black text-lg sm:text-2xl leading-tight">
-                  Sizga ham shunday<br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">tizim kerakmi?</span>
+                <h3 className={`font-black text-lg sm:text-2xl leading-tight ${dark ? 'text-white' : 'text-slate-800'}`}>
+                  {t.devTitle}<br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">{t.devHighlight}</span>
                 </h3>
-                <p className="text-slate-500 text-xs mt-2 leading-relaxed max-w-sm">
-                  Web ilovalar, Telegram botlar va mobil dizayn bo'yicha professional yechimlar taklif etaman.
+                <p className={`text-xs mt-2 leading-relaxed max-w-sm ${dark ? 'text-slate-500' : 'text-slate-500'}`}>
+                  {t.devDesc}
                 </p>
               </div>
 
@@ -168,7 +253,7 @@ function DeveloperPromo({ navigate }) {
                     href={`https://github.com/Dovudbek-Roziev/${name}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="proj-card bg-white/[0.04] border border-white/[0.08] rounded-xl p-3 group"
+                    className={`proj-card rounded-xl p-3 group border ${dark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-slate-50 border-slate-200'}`}
                   >
                     <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center mb-2`}>
                       <Code2 size={13} className="text-white" />
@@ -192,10 +277,10 @@ function DeveloperPromo({ navigate }) {
                 href="https://github.com/Dovudbek-Roziev"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/[0.08] text-slate-400 text-xs hover:text-white hover:border-white/20 hover:bg-white/[0.04] transition-all"
+                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border text-xs transition-all ${dark ? 'border-white/[0.08] text-slate-400 hover:text-white hover:border-white/20 hover:bg-white/[0.04]' : 'border-slate-200 text-slate-500 hover:text-slate-800 hover:border-slate-300 hover:bg-slate-50'}`}
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-                Barcha loyihalarni ko'rish →
+                {t.devAll}
               </a>
             </div>
           </div>
@@ -205,42 +290,37 @@ function DeveloperPromo({ navigate }) {
   );
 }
 
-const faqs = [
-  { q: "Tizimga qanday kirish mumkin?", a: "Trener yoki futbolchi sifatida login va parolingiz bilan tizimga kirishingiz mumkin. Hisob yo'q bo'lsa, klub administratoriga murojaat qiling." },
-  { q: "Futbolchi o'z ma'lumotlarini ko'ra oladimi?", a: "Ha. Futbolchi o'z profilida davomat, mashg'ulotlar jadvalini va to'lov holatini real vaqtda ko'ra oladi." },
-  { q: "To'lovlar qanday nazorat qilinadi?", a: "Trener har bir futbolchining oylik to'lov holatini belgilaydi. Tizim avtomatik hisobot va qarzdorlik ro'yxatini ko'rsatadi." },
-  { q: "Bir nechta jamoa boshqarish mumkinmi?", a: "Ha. Trener bir nechta jamoani alohida boshqarishi, har bir jamoa uchun mashg'ulot va to'lovlarni sozlashi mumkin." },
-  { q: "Tizim mobil telefonda ishlaydi ham?", a: "Ha, tizim to'liq mobil qurilmalar uchun moslashtirilgan — telefon yoki planshetdan bemalol foydalanish mumkin." },
-];
-
-function FAQ() {
+function FAQ({ t, dark }) {
   const [open, setOpen] = useState(null);
   return (
     <div className="relative z-10 px-6 pb-16 max-w-3xl mx-auto">
-      <p className="text-center text-xs text-slate-600 font-semibold uppercase tracking-widest mb-3">FAQ</p>
-      <h2 className="text-center text-white font-black text-2xl sm:text-3xl mb-8">
-        Tez-tez so'raladigan <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">savollar</span>
+      <p className={`text-center text-xs font-semibold uppercase tracking-widest mb-3 ${dark ? 'text-slate-600' : 'text-slate-400'}`}>FAQ</p>
+      <h2 className={`text-center font-black text-2xl sm:text-3xl mb-8 ${dark ? 'text-white' : 'text-slate-900'}`}>
+        {t.faqTitle} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">{t.faqHighlight}</span>
       </h2>
       <div className="flex flex-col gap-3">
-        {faqs.map((item, i) => (
+        {t.faqs.map((item, i) => (
           <div
             key={i}
-            className={`rounded-2xl border transition-all duration-300 overflow-hidden ${open === i ? 'border-blue-500/40 bg-blue-950/30' : 'border-white/[0.07] bg-white/[0.03] hover:border-white/[0.12]'}`}
+            className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
+              open === i
+                ? 'border-blue-500/40 bg-blue-500/10'
+                : dark
+                  ? 'border-white/[0.07] bg-white/[0.03] hover:border-white/[0.12]'
+                  : 'border-slate-200 bg-white hover:border-blue-300 shadow-sm'
+            }`}
           >
-            <button
-              onClick={() => setOpen(open === i ? null : i)}
-              className="w-full flex items-center justify-between px-5 py-4 text-left gap-4"
-            >
-              <span className={`text-sm font-semibold transition-colors ${open === i ? 'text-blue-300' : 'text-slate-200'}`}>{item.q}</span>
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 border transition-all duration-300 ${open === i ? 'bg-blue-600 border-blue-500 rotate-45' : 'border-white/[0.15] bg-white/[0.05]'}`}>
+            <button onClick={() => setOpen(open === i ? null : i)} className="w-full flex items-center justify-between px-5 py-4 text-left gap-4">
+              <span className={`text-sm font-semibold transition-colors ${open === i ? 'text-blue-500' : dark ? 'text-slate-200' : 'text-slate-700'}`}>{item.q}</span>
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 border transition-all duration-300 ${open === i ? 'bg-blue-600 border-blue-500 rotate-45' : dark ? 'border-white/[0.15] bg-white/[0.05]' : 'border-slate-200 bg-slate-50'}`}>
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                  <line x1="5" y1="1" x2="5" y2="9" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                  <line x1="1" y1="5" x2="9" y2="5" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                  <line x1="5" y1="1" x2="5" y2="9" stroke={open === i ? 'white' : dark ? 'white' : '#64748b'} strokeWidth="1.5" strokeLinecap="round"/>
+                  <line x1="1" y1="5" x2="9" y2="5" stroke={open === i ? 'white' : dark ? 'white' : '#64748b'} strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
               </div>
             </button>
             <div className={`transition-all duration-300 ${open === i ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
-              <p className="px-5 pb-4 text-slate-400 text-sm leading-relaxed">{item.a}</p>
+              <p className={`px-5 pb-4 text-sm leading-relaxed ${dark ? 'text-slate-400' : 'text-slate-500'}`}>{item.a}</p>
             </div>
           </div>
         ))}
@@ -252,6 +332,9 @@ function FAQ() {
 export default function Landing() {
   const navigate = useNavigate();
   const [v, setV] = useState(false);
+  const [dark, setDark] = useState(true);
+  const [lang, setLang] = useState('uz');
+  const t = translations[lang];
 
   useEffect(() => {
     const t = setTimeout(() => setV(true), 80);
@@ -349,50 +432,67 @@ export default function Landing() {
         }
       `}</style>
 
-      <div className="min-h-screen bg-slate-950 relative overflow-hidden">
+      <div className={`min-h-screen relative overflow-hidden transition-colors duration-500 ${dark ? 'bg-slate-950' : 'bg-slate-50'}`}>
 
         {/* ── Background: pitch lines ── */}
-        <div className="absolute inset-0 pointer-events-none select-none opacity-[0.045]">
+        <div className={`absolute inset-0 pointer-events-none select-none ${dark ? 'opacity-[0.045]' : 'opacity-[0.06]'}`}>
           <svg className="w-full h-full" viewBox="0 0 900 650" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-            <rect x="50" y="50" width="800" height="550" fill="none" stroke="white" strokeWidth="3" rx="4"/>
-            <line x1="450" y1="50" x2="450" y2="600" stroke="white" strokeWidth="2"/>
-            <circle cx="450" cy="325" r="80" fill="none" stroke="white" strokeWidth="2"/>
-            <circle cx="450" cy="325" r="6" fill="white"/>
-            <rect x="50" y="195" width="145" height="260" fill="none" stroke="white" strokeWidth="2"/>
-            <rect x="705" y="195" width="145" height="260" fill="none" stroke="white" strokeWidth="2"/>
-            <rect x="50" y="248" width="60" height="154" fill="none" stroke="white" strokeWidth="2"/>
-            <rect x="790" y="248" width="60" height="154" fill="none" stroke="white" strokeWidth="2"/>
-            <path d="M 195 235 A 78 78 0 0 1 195 415" fill="none" stroke="white" strokeWidth="2"/>
-            <path d="M 705 235 A 78 78 0 0 0 705 415" fill="none" stroke="white" strokeWidth="2"/>
-            <path d="M 50 72 A 22 22 0 0 1 72 50" fill="none" stroke="white" strokeWidth="2"/>
-            <path d="M 828 50 A 22 22 0 0 1 850 72" fill="none" stroke="white" strokeWidth="2"/>
-            <path d="M 50 578 A 22 22 0 0 0 72 600" fill="none" stroke="white" strokeWidth="2"/>
-            <path d="M 828 600 A 22 22 0 0 0 850 578" fill="none" stroke="white" strokeWidth="2"/>
+            <rect x="50" y="50" width="800" height="550" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="3" rx="4"/>
+            <line x1="450" y1="50" x2="450" y2="600" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
+            <circle cx="450" cy="325" r="80" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
+            <circle cx="450" cy="325" r="6" fill={dark ? 'white' : '#1e40af'}/>
+            <rect x="50" y="195" width="145" height="260" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
+            <rect x="705" y="195" width="145" height="260" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
+            <rect x="50" y="248" width="60" height="154" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
+            <rect x="790" y="248" width="60" height="154" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
+            <path d="M 195 235 A 78 78 0 0 1 195 415" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
+            <path d="M 705 235 A 78 78 0 0 0 705 415" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
+            <path d="M 50 72 A 22 22 0 0 1 72 50" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
+            <path d="M 828 50 A 22 22 0 0 1 850 72" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
+            <path d="M 50 578 A 22 22 0 0 0 72 600" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
+            <path d="M 828 600 A 22 22 0 0 0 850 578" fill="none" stroke={dark ? 'white' : '#1e40af'} strokeWidth="2"/>
           </svg>
         </div>
 
         {/* ── Radial glow center ── */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 40%, rgba(29,78,216,0.12) 0%, transparent 70%)' }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 40%, rgba(29,78,216,0.10) 0%, transparent 70%)' }} />
 
         {/* ── Decorative blobs ── */}
         <div className="absolute top-[-80px] left-[-80px] w-64 h-64 bg-blue-700/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-[-60px] right-[-60px] w-64 h-64 bg-violet-700/15 rounded-full blur-3xl pointer-events-none" />
 
         {/* ── Announcement strip ── */}
-        <AnnouncementStrip />
+        <AnnouncementStrip t={t} />
 
         {/* ── Top nav bar ── */}
         <div className={`relative z-10 flex items-center justify-between px-6 sm:px-10 py-5 transition-all duration-700 ${v ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
           <div className="flex items-center gap-2.5">
             <img src={logo} alt="logo" className="w-12 h-12 object-contain" />
-            <span className="text-white font-bold text-sm tracking-tight">FK Imom Hasan</span>
+            <span className={`font-bold text-sm tracking-tight ${dark ? 'text-white' : 'text-slate-800'}`}>{t.navTitle}</span>
           </div>
-          <button
-            onClick={() => navigate('/login')}
-            className="px-5 py-2.5 rounded-xl bg-white text-slate-900 text-sm font-semibold hover:bg-blue-50 transition-all shadow-lg hover:shadow-blue-200/30 hover:-translate-y-0.5"
-          >
-            Kirish →
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Lang toggle */}
+            <button
+              onClick={() => setLang(lang === 'uz' ? 'ru' : 'uz')}
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${dark ? 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 shadow-sm'}`}
+            >
+              {lang === 'uz' ? 'РУС' : 'UZB'}
+            </button>
+            {/* Dark/Light toggle */}
+            <button
+              onClick={() => setDark(!dark)}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all border ${dark ? 'border-white/10 bg-white/5 text-yellow-400 hover:bg-white/10' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 shadow-sm'}`}
+            >
+              {dark ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+            {/* Login */}
+            <button
+              onClick={() => navigate('/login')}
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg hover:-translate-y-0.5 ${dark ? 'bg-white text-slate-900 hover:bg-blue-50 hover:shadow-blue-200/30' : 'bg-blue-600 text-white hover:bg-blue-500 hover:shadow-blue-400/30'}`}
+            >
+              {t.login}
+            </button>
+          </div>
         </div>
 
         {/* ── Hero ── */}
@@ -413,12 +513,12 @@ export default function Landing() {
 
           {/* Club name */}
           <h1 className={`mt-7 text-4xl sm:text-6xl font-black tracking-tight transition-all duration-700 delay-200 ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <span className="shimmer-text">FK Imom Hasan</span>
+            <span className="shimmer-text">{t.heroTitle}</span>
           </h1>
 
           {/* Tagline */}
-          <p className={`mt-4 text-slate-400 text-sm sm:text-lg max-w-lg leading-relaxed transition-all duration-700 delay-300 ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            Professional futbol klub boshqaruv tizimi — trenerlar, futbolchilar va to'lovlarni bir joyda boshqaring
+          <p className={`mt-4 text-sm sm:text-lg max-w-lg leading-relaxed transition-all duration-700 delay-300 ${dark ? 'text-slate-400' : 'text-slate-500'} ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            {t.heroDesc}
           </p>
 
           {/* CTA buttons */}
@@ -427,26 +527,22 @@ export default function Landing() {
               onClick={() => navigate('/login')}
               className="px-8 py-3.5 rounded-2xl bg-blue-600 text-white font-semibold text-sm hover:bg-blue-500 transition-all shadow-2xl shadow-blue-900/50 hover:shadow-blue-700/60 hover:-translate-y-1 active:scale-95"
             >
-              Tizimga kirish
+              {t.cta}
             </button>
-            <div className="flex items-center gap-2 text-slate-500 text-sm">
+            <div className={`flex items-center gap-2 text-sm ${dark ? 'text-slate-500' : 'text-slate-400'}`}>
               <Trophy size={14} className="text-yellow-500" />
-              Professional boshqaruv
+              {t.ctaSub}
             </div>
           </div>
 
           {/* Stats */}
           <div className={`mt-10 sm:mt-16 grid grid-cols-3 gap-4 sm:gap-20 transition-all duration-700 delay-[600ms] ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            {[
-              { label: 'Futbolchi', target: 50, suffix: '+' },
-              { label: "Mashg'ulot", target: 200, suffix: '+' },
-              { label: 'Trener', target: 10, suffix: '+' },
-            ].map((s) => (
-              <div key={s.label} className="text-center">
-                <p className="text-2xl sm:text-5xl font-black text-white tabular-nums">
-                  <Counter target={s.target} suffix={s.suffix} />
+            {[50, 200, 10].map((target, i) => (
+              <div key={i} className="text-center">
+                <p className={`text-2xl sm:text-5xl font-black tabular-nums ${dark ? 'text-white' : 'text-slate-800'}`}>
+                  <Counter target={target} suffix="+" />
                 </p>
-                <p className="text-slate-500 text-[10px] sm:text-sm mt-1 font-medium">{s.label}</p>
+                <p className={`text-[10px] sm:text-sm mt-1 font-medium ${dark ? 'text-slate-500' : 'text-slate-400'}`}>{t.statLabels[i]}</p>
               </div>
             ))}
           </div>
@@ -459,18 +555,15 @@ export default function Landing() {
 
         {/* ── Features ── */}
         <div className={`relative z-10 px-6 pb-16 max-w-4xl mx-auto transition-all duration-700 delay-[750ms] ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <p className="text-center text-xs text-slate-600 font-semibold uppercase tracking-widest mb-6">Imkoniyatlar</p>
+          <p className={`text-center text-xs font-semibold uppercase tracking-widest mb-6 ${dark ? 'text-slate-600' : 'text-slate-400'}`}>{t.featuresTitle}</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {features.map(({ Icon, title, desc, gradient, glow }) => (
-              <div
-                key={title}
-                className={`card-hover bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 cursor-default`}
-              >
+            {features.map(({ Icon, gradient, glow }, i) => (
+              <div key={i} className={`card-hover rounded-2xl p-5 cursor-default border ${dark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-white border-slate-200 shadow-sm'}`}>
                 <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg ${glow}`}>
                   <Icon size={20} strokeWidth={1.75} className="text-white" />
                 </div>
-                <h3 className="text-white font-semibold text-sm mb-1.5">{title}</h3>
-                <p className="text-slate-500 text-xs leading-relaxed">{desc}</p>
+                <h3 className={`font-semibold text-sm mb-1.5 ${dark ? 'text-white' : 'text-slate-800'}`}>{t.features[i].title}</h3>
+                <p className={`text-xs leading-relaxed ${dark ? 'text-slate-500' : 'text-slate-500'}`}>{t.features[i].desc}</p>
               </div>
             ))}
           </div>
@@ -483,54 +576,24 @@ export default function Landing() {
 
         {/* ── Qo'llanma ── */}
         <div className={`relative z-10 px-6 pb-20 max-w-4xl mx-auto transition-all duration-700 delay-[900ms] ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <p className="text-center text-xs text-slate-600 font-semibold uppercase tracking-widest mb-10">Qo'llanma</p>
-
+          <p className={`text-center text-xs font-semibold uppercase tracking-widest mb-10 ${dark ? 'text-slate-600' : 'text-slate-400'}`}>{t.guideTitle}</p>
           <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-0">
-            {/* connecting line — desktop only */}
             <div className="hidden sm:block absolute top-8 left-[calc(16.67%)] right-[calc(16.67%)] h-px bg-gradient-to-r from-blue-600/40 via-violet-500/40 to-emerald-500/40 z-0" />
-
             {[
-              {
-                num: '01',
-                Icon: LogIn,
-                title: 'Kiring',
-                desc: 'Trener yoki futbolchi sifatida tizimga kiring',
-                grad: 'from-blue-500 to-blue-700',
-                delay: '100ms',
-              },
-              {
-                num: '02',
-                Icon: Settings,
-                title: 'Sozlang',
-                desc: 'Jamoangizni tuzing, mashg\'ulotlar va to\'lovlarni belgilang',
-                grad: 'from-violet-500 to-purple-700',
-                delay: '250ms',
-              },
-              {
-                num: '03',
-                Icon: TrendingUp,
-                title: 'Kuzating',
-                desc: 'Statistika, davomat va moliyani real vaqtda nazorat qiling',
-                grad: 'from-emerald-500 to-green-700',
-                delay: '400ms',
-              },
-            ].map(({ num, Icon, title, desc, grad, delay }) => (
-              <div key={num} className="relative z-10 flex-1 w-full sm:w-auto flex flex-col items-center text-center px-4">
-                <div
-                  className={`step-card bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 w-full cursor-default`}
-                  style={{ animationDelay: delay }}
-                >
+              { Icon: LogIn, grad: 'from-blue-500 to-blue-700', delay: '100ms' },
+              { Icon: Settings, grad: 'from-violet-500 to-purple-700', delay: '250ms' },
+              { Icon: TrendingUp, grad: 'from-emerald-500 to-green-700', delay: '400ms' },
+            ].map(({ Icon, grad, delay }, i) => (
+              <div key={i} className="relative z-10 flex-1 w-full sm:w-auto flex flex-col items-center text-center px-4">
+                <div className={`step-card rounded-2xl p-6 w-full cursor-default border ${dark ? 'bg-white/[0.04] border-white/[0.08]' : 'bg-white border-slate-200 shadow-sm'}`} style={{ animationDelay: delay }}>
                   <div className={`step-num w-14 h-14 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
                     <Icon size={24} strokeWidth={1.75} className="text-white" />
                   </div>
-                  <span className="text-[10px] font-black text-slate-600 tracking-[0.2em] mb-1 block">{num}</span>
-                  <h3 className="text-white font-bold text-base mb-2">{title}</h3>
-                  <p className="text-slate-500 text-xs leading-relaxed">{desc}</p>
+                  <span className={`text-[10px] font-black tracking-[0.2em] mb-1 block ${dark ? 'text-slate-600' : 'text-slate-400'}`}>{t.steps[i].num}</span>
+                  <h3 className={`font-bold text-base mb-2 ${dark ? 'text-white' : 'text-slate-800'}`}>{t.steps[i].title}</h3>
+                  <p className={`text-xs leading-relaxed ${dark ? 'text-slate-500' : 'text-slate-500'}`}>{t.steps[i].desc}</p>
                 </div>
-                {/* mobile arrow */}
-                <div className="sm:hidden mt-3 mb-1 text-slate-700">
-                  <ChevronRight size={16} className="rotate-90" />
-                </div>
+                <div className="sm:hidden mt-3 mb-1 text-slate-400"><ChevronRight size={16} className="rotate-90" /></div>
               </div>
             ))}
           </div>
@@ -540,46 +603,39 @@ export default function Landing() {
         <div className="relative z-10 mx-auto max-w-4xl px-6 mb-8">
           <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
         </div>
-        <FAQ />
+        <FAQ t={t} dark={dark} />
 
         {/* ── Developer promo ── */}
-        <DeveloperPromo navigate={navigate} />
+        <DeveloperPromo navigate={navigate} t={t} dark={dark} />
 
         {/* ── Footer ── */}
-        <footer className="relative z-10 border-t border-white/[0.06]">
+        <footer className={`relative z-10 border-t ${dark ? 'border-white/[0.06]' : 'border-slate-200'}`}>
           <div className="max-w-4xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-3 gap-10">
 
             {/* Brand */}
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 ring-1 ring-white/10 flex-shrink-0">
+                <div className={`w-10 h-10 rounded-xl overflow-hidden ring-1 flex-shrink-0 ${dark ? 'bg-white/10 ring-white/10' : 'bg-slate-100 ring-slate-200'}`}>
                   <img src={logo} alt="logo" className="w-full h-full object-contain" />
                 </div>
-                <span className="text-white font-bold text-sm">FK Imom Hasan</span>
+                <span className={`font-bold text-sm ${dark ? 'text-white' : 'text-slate-800'}`}>FK Imom Hasan</span>
               </div>
-              <p className="text-slate-500 text-xs leading-relaxed">
-                Professional futbol klub boshqaruv tizimi. Trenerlar va futbolchilar uchun qulay platforma.
-              </p>
+              <p className={`text-xs leading-relaxed ${dark ? 'text-slate-500' : 'text-slate-500'}`}>{t.footerDesc}</p>
               <div className="flex items-center gap-2 mt-1">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-emerald-500 text-xs font-medium">Tizim faol</span>
+                <span className="text-emerald-500 text-xs font-medium">{t.footerActive}</span>
               </div>
             </div>
 
             {/* Links */}
             <div>
-              <p className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-4">Sahifalar</p>
+              <p className={`text-xs font-semibold uppercase tracking-widest mb-4 ${dark ? 'text-slate-400' : 'text-slate-500'}`}>{t.footerPages}</p>
               <ul className="space-y-2.5">
-                {[
-                  { label: 'Trener paneli', path: '/dashboard' },
-                  { label: 'Futbolchi paneli', path: '/player/home' },
-                  { label: 'Mashg\'ulotlar', path: '/trainings' },
-                  { label: 'To\'lovlar', path: '/payments' },
-                ].map(({ label, path }) => (
+                {t.footerLinks.map((label) => (
                   <li key={label}>
                     <button
                       onClick={() => navigate('/login')}
-                      className="text-slate-500 text-xs hover:text-blue-400 transition-colors flex items-center gap-1.5 group"
+                      className={`text-xs transition-colors flex items-center gap-1.5 group ${dark ? 'text-slate-500 hover:text-blue-400' : 'text-slate-500 hover:text-blue-600'}`}
                     >
                       <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity -ml-2 group-hover:ml-0 text-blue-400" />
                       {label}
@@ -591,26 +647,26 @@ export default function Landing() {
 
             {/* Contact */}
             <div>
-              <p className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-4">Aloqa</p>
+              <p className={`text-xs font-semibold uppercase tracking-widest mb-4 ${dark ? 'text-slate-400' : 'text-slate-500'}`}>{t.footerContact}</p>
               <ul className="space-y-3">
                 <li className="flex items-start gap-2.5">
                   <Phone size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-slate-500 text-xs">+996 755 507 111</span>
+                  <span className={`text-xs ${dark ? 'text-slate-500' : 'text-slate-500'}`}>+996 755 507 111</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <MapPin size={14} className="text-rose-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-slate-500 text-xs">Osh, Qirg'iziston</span>
+                  <span className={`text-xs ${dark ? 'text-slate-500' : 'text-slate-500'}`}>Osh, Qirg'iziston</span>
                 </li>
               </ul>
             </div>
           </div>
 
           {/* Developer section */}
-          <div className="border-t border-white/[0.05]">
+          <div className={`border-t ${dark ? 'border-white/[0.05]' : 'border-slate-200'}`}>
             <div className="max-w-4xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-slate-700 text-xs">© 2026 FK Imom Hasan. Barcha huquqlar himoyalangan.</p>
+              <p className={`text-xs ${dark ? 'text-slate-700' : 'text-slate-400'}`}>{t.footerCopy}</p>
               <div className="flex items-center gap-3">
-                <span className="text-slate-600 text-xs">Dasturchi: <span className="text-slate-400 font-medium">Dovudbek Roziev</span></span>
+                <span className={`text-xs ${dark ? 'text-slate-600' : 'text-slate-400'}`}>{t.footerDev} <span className={`font-medium ${dark ? 'text-slate-400' : 'text-slate-600'}`}>Dovudbek Roziev</span></span>
                 <div className="flex items-center gap-2">
                   {/* Instagram */}
                   <a
