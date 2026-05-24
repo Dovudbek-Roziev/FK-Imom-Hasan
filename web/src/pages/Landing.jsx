@@ -266,8 +266,8 @@ export default function Landing() {
           50% { transform: translateY(-12px); }
         }
         @keyframes glow-pulse {
-          0%, 100% { box-shadow: 0 0 30px 0px rgba(59,130,246,0.35), 0 0 0 0 rgba(59,130,246,0.15); }
-          50% { box-shadow: 0 0 50px 8px rgba(59,130,246,0.55), 0 0 0 8px rgba(59,130,246,0.08); }
+          0%, 100% { filter: drop-shadow(0 0 14px rgba(59,130,246,0.5)) drop-shadow(0 0 30px rgba(99,102,241,0.25)); }
+          50% { filter: drop-shadow(0 0 28px rgba(59,130,246,0.85)) drop-shadow(0 0 55px rgba(139,92,246,0.45)); }
         }
         @keyframes spin-slow {
           from { transform: rotate(0deg); }
@@ -384,7 +384,7 @@ export default function Landing() {
         {/* ── Top nav bar ── */}
         <div className={`relative z-10 flex items-center justify-between px-6 sm:px-10 py-5 transition-all duration-700 ${v ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
           <div className="flex items-center gap-2.5">
-            <img src={logo} alt="logo" className="w-9 h-9 object-contain" />
+            <img src={logo} alt="logo" className="w-12 h-12 object-contain" />
             <span className="text-white font-bold text-sm tracking-tight">FK Imom Hasan</span>
           </div>
           <button
@@ -403,9 +403,12 @@ export default function Landing() {
             className={`transition-all duration-700 delay-100 ${v ? 'opacity-100 scale-100' : 'opacity-0 scale-75'}`}
             style={{ animation: v ? 'float 3.5s ease-in-out infinite' : 'none' }}
           >
-            <div style={{ animation: v ? 'glow-pulse 3s ease-in-out infinite' : 'none' }}>
-              <img src={logo} alt="logo" className="w-44 h-44 object-contain drop-shadow-2xl" />
-            </div>
+            <img
+              src={logo}
+              alt="logo"
+              className="w-44 h-44 object-contain"
+              style={{ animation: v ? 'glow-pulse 3s ease-in-out infinite' : 'none' }}
+            />
           </div>
 
           {/* Club name */}
