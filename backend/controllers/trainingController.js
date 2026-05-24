@@ -179,11 +179,14 @@ const getMyTrainings = async (req, res) => {
 // Kelgusi trenirovkalar (futbolchi uchun)
 const getUpcomingTrainings = async (req, res) => {
   try {
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+
     const trainings = await Training.find({
       coach: req.coachId,
       status: 'rejalashtirilgan',
       $or: [
-        { date: { $gte: new Date() } },
+        { date: { $gte: todayStart } },
         { days: { $exists: true, $ne: [] } }
       ]
     })

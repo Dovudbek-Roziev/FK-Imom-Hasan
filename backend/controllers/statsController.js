@@ -120,7 +120,10 @@ const getIncomeStats = async (req, res) => {
 // Futbolchi o'z statistikasini ko'rish
 const getMyStats = async (req, res) => {
   try {
-    const player = await Player.findById(req.playerId).select('stats firstName lastName');
+    const player = await Player.findById(req.playerId)
+      .select('stats firstName lastName position age photo healthStatus team coach')
+      .populate('team', 'name color')
+      .populate('coach', 'firstName lastName photo');
     if (!player) {
       return res.status(404).json({ message: 'Futbolchi topilmadi.' });
     }
@@ -150,7 +153,17 @@ const getMyStats = async (req, res) => {
     res.json({
       success: true,
       stats: player.stats,
-      ratingHistory
+      ratingHistory,
+      profile: {
+        firstName: player.firstName,
+        lastName: player.lastName,
+        position: player.position,
+        age: player.age,
+        photo: player.photo,
+        healthStatus: player.healthStatus,
+        team: player.team,
+        coach: player.coach
+      }
     });
   } catch (error) {
     res.status(500).json({ message: 'Server xatosi.' });
