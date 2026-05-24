@@ -11,24 +11,34 @@ const generateToken = (id, role, extra = {}) => {
 
 // Trener login
 const coachLogin = async (req, res) => {
+  console.log('Coach login boshlandi');
   try {
     const { email, password } = req.body;
+    console.log('Email:', email, 'Password bor:', !!password);
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email va parol kiritish shart.' });
     }
 
+    console.log('DB dan trener qidirilmoqda...');
     const coach = await Coach.findOne({ email: email.toLowerCase(), isActive: true });
+    console.log('Trener topildimi:', !!coach);
+
     if (!coach) {
       return res.status(401).json({ message: 'Email yoki parol noto\'g\'ri.' });
     }
 
+    console.log('Parol tekshirilmoqda...');
     const isMatch = await coach.comparePassword(password);
+    console.log('Parol to\'g\'rimi:', isMatch);
+
     if (!isMatch) {
       return res.status(401).json({ message: 'Email yoki parol noto\'g\'ri.' });
     }
 
+    console.log('Token yaratilmoqda...');
     const token = generateToken(coach._id, 'coach');
+    console.log('Token yaratildi');
 
     res.json({
       success: true,
@@ -43,7 +53,7 @@ const coachLogin = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Coach login xatosi:', error);
+    console.error('Coach login xatosi:', error.message, error.stack);
     res.status(500).json({ message: 'Server xatosi.', error: error.message });
   }
 };
