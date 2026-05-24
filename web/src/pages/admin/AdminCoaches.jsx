@@ -177,6 +177,8 @@ export default function AdminCoaches() {
   const [passwordCoach, setPasswordCoach] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
   const [revokingId, setRevokingId] = useState(null);
+  const [deleteCoach, setDeleteCoach] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const load = () => {
     setLoading(true);
@@ -195,6 +197,17 @@ export default function AdminCoaches() {
       load();
     } catch {}
     setTogglingId(null);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteCoach) return;
+    setDeletingId(deleteCoach._id);
+    try {
+      await adminApi.delete(`/admin/coaches/${deleteCoach._id}`);
+      setDeleteCoach(null);
+      load();
+    } catch {}
+    setDeletingId(null);
   };
 
   const handleRevoke = async (coachId) => {
@@ -295,6 +308,12 @@ export default function AdminCoaches() {
                 >
                   {coach.isActive ? '🚫 Bloklash' : '✅ Faol'}
                 </button>
+                <button
+                  onClick={() => setDeleteCoach(coach)}
+                  className="px-3 py-2 text-xs rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 text-center"
+                >
+                  🗑️ O'chirish
+                </button>
               </div>
             </div>
           ))}
@@ -320,6 +339,21 @@ export default function AdminCoaches() {
       {passwordCoach && (
         <Modal title="Parolni yangilash" onClose={() => setPasswordCoach(null)}>
           <PasswordForm coach={passwordCoach} onSave={() => { setPasswordCoach(null); load(); }} onCancel={() => setPasswordCoach(null)} />
+        </Modal>
+      )}
+      {deleteCoach && (
+        <Modal title="Trenerni o'chirish" onClose={() => setDeleteCoach(null)}>
+          <div className="space-y-4">
+            <p className="text-sm text-slate-600">
+              <strong>{deleteCoach.firstName} {deleteCoach.lastName}</strong> va uning barcha futbolchilari o'chiriladi. Bu amalni qaytarib bo'lmaydi.
+            </p>
+            <div className="flex gap-3 pt-2">
+              <button onClick={() => setDeleteCoach(null)} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-medium text-sm hover:bg-slate-50">Bekor</button>
+              <button onClick={handleDelete} disabled={!!deletingId} className="flex-1 py-2.5 rounded-xl bg-red-600 text-white font-medium text-sm hover:bg-red-700 disabled:opacity-60">
+                {deletingId ? 'O\'chirilmoqda...' : 'O\'chirish'}
+              </button>
+            </div>
+          </div>
         </Modal>
       )}
 

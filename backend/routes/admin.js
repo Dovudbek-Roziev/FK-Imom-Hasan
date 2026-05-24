@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   getCoaches, createCoach, updateCoachPassword,
-  grantPremium, revokePremium, getAdminStats, toggleCoachStatus
+  grantPremium, revokePremium, getAdminStats, toggleCoachStatus, deleteCoach
 } = require('../controllers/adminController');
 const { authAdmin } = require('../middleware/auth');
 
@@ -17,6 +17,7 @@ router.get('/coaches', getCoaches);
 router.post('/coaches', createCoach);
 router.put('/coaches/:id/password', updateCoachPassword);
 router.put('/coaches/:id/toggle', toggleCoachStatus);
+router.delete('/coaches/:id', deleteCoach);
 
 // Premium boshqarish
 router.post('/premium/grant', grantPremium);

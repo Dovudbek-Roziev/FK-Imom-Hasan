@@ -199,7 +199,19 @@ const toggleCoachStatus = async (req, res) => {
   }
 };
 
+// Trenerni o'chirish
+const deleteCoach = async (req, res) => {
+  try {
+    const coach = await Coach.findByIdAndDelete(req.params.id);
+    if (!coach) return res.status(404).json({ message: 'Trener topilmadi.' });
+    await Player.deleteMany({ coach: req.params.id });
+    res.json({ success: true, message: 'Trener o\'chirildi.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server xatosi.' });
+  }
+};
+
 module.exports = {
   getCoaches, createCoach, updateCoachPassword,
-  grantPremium, revokePremium, getAdminStats, toggleCoachStatus
+  grantPremium, revokePremium, getAdminStats, toggleCoachStatus, deleteCoach
 };
