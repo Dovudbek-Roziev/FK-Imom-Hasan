@@ -41,7 +41,7 @@ export default function Layout({ children }) {
             <img src={logo} alt="logo" className="w-full h-full object-contain drop-shadow-sm" />
           </div>
         <div>
-          <p className="font-bold text-slate-800 text-sm leading-tight">Imom Hasan FK</p>
+          <p className="font-bold text-slate-800 text-sm leading-tight">FK Imom Hasan</p>
           <p className="text-xs text-slate-500">{role === 'coach' ? 'Trener paneli' : 'Futbolchi paneli'}</p>
         </div>
       </div>

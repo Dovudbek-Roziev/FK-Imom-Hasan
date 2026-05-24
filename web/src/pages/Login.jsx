@@ -80,7 +80,7 @@ export default function Login() {
           <div className="inline-flex items-center justify-center w-28 h-28 mb-4 bg-white/10 rounded-3xl backdrop-blur-sm ring-1 ring-white/20 shadow-2xl">
             <img src={logo} alt="Imom Hasan FK" className="w-20 h-20 object-contain drop-shadow-xl" />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Imom Hasan FK</h1>
+          <h1 className="text-3xl font-bold text-white tracking-tight"> FK Imom Hasan</h1>
           <p className="text-blue-300 mt-1 text-sm">Futbol klubi boshqaruv tizimi</p>
         </div>
 
