@@ -18,12 +18,16 @@ function Sidebar({ onClose }) {
 
   return (
     <aside className="flex flex-col h-full w-64 bg-slate-900 text-white">
-      <div className="px-6 py-6 border-b border-slate-700 text-center">
-        <div className="w-20 h-20 mx-auto mb-3 rounded-2xl overflow-hidden shadow-lg shadow-blue-900/40 ring-2 ring-white/10 bg-white/10">
-          <img src={logo} alt="logo" className="w-full h-full object-contain" />
+      <div className="px-5 py-4 border-b border-slate-700">
+        <div className="flex items-center gap-3">
+          <div className="w-14 h-14 flex-shrink-0 rounded-2xl overflow-hidden shadow-md shadow-blue-900/40 ring-2 ring-white/10 bg-white/10">
+            <img src={logo} alt="logo" className="w-full h-full object-contain" />
+          </div>
+          <div>
+            <p className="font-bold text-sm leading-tight">Imom Hasan FK</p>
+            <p className="text-xs text-slate-400 mt-0.5">Admin paneli</p>
+          </div>
         </div>
-        <p className="font-bold text-sm leading-tight">Imom Hasan FK</p>
-        <p className="text-xs text-slate-400 mt-0.5">Admin paneli</p>
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">
