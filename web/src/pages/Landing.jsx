@@ -37,7 +37,7 @@ const translations = {
     devHighlight: 'tizim kerakmi?',
     devDesc: "Web ilovalar, Telegram botlar va mobil dizayn bo'yicha professional yechimlar taklif etaman.",
     devAll: 'Barcha loyihalarni ko\'rish →',
-    services: ['Web ilovalar', 'Telegram botlar', 'Mobil dizayn', 'Full-stack'],
+    services: ['Web ilovalar', 'Telegram botlar', 'Mobil ilovalar', 'Full-stack'],
     projects: [
       { name: 'FK-Imom-Hasan', desc: 'Futbol klub tizimi' },
       { name: 'CVcraft', desc: 'CV yaratuvchi platforma' },
@@ -87,7 +87,7 @@ const translations = {
     devHighlight: 'система?',
     devDesc: "Предлагаю профессиональные решения: веб-приложения, Telegram-боты и мобильный дизайн.",
     devAll: 'Посмотреть все проекты →',
-    services: ['Веб-приложения', 'Telegram-боты', 'Мобильный дизайн', 'Full-stack'],
+    services: ['Веб-приложения', 'Telegram-боты', 'Мобильные приложения', 'Full-stack'],
     projects: [
       { name: 'FK-Imom-Hasan', desc: 'Система футбольного клуба' },
       { name: 'CVcraft', desc: 'Платформа создания резюме' },
