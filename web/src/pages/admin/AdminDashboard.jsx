@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import adminApi from '../../api/adminApi';
 
 function StatCard({ icon, label, value, sub, color }) {
@@ -57,13 +58,13 @@ export default function AdminDashboard() {
       <div className="bg-white rounded-2xl p-6 shadow-sm">
         <h2 className="font-semibold text-slate-800 mb-4">Tezkor havolalar</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <a href="/admin/coaches" className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
+          <Link to="/admin/coaches" className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
             <span className="text-2xl">👥</span>
             <div>
               <p className="font-medium text-slate-800 text-sm">Trenerlar boshqaruvi</p>
               <p className="text-xs text-slate-500">Yaratish, bloklash, premium berish</p>
             </div>
-          </a>
+          </Link>
           <div className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 bg-slate-50 opacity-60">
             <span className="text-2xl">📋</span>
             <div>

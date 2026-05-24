@@ -111,17 +111,17 @@ export default function PlayerHome() {
       ) : (
         <>
           {/* Statistika kartalar */}
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-1.5">
             {[
               { label: 'Trening', value: stats?.totalTrainings ?? 0, icon: '📅' },
               { label: 'Qatnashdi', value: stats?.trainingsAttended ?? 0, icon: '✅' },
               { label: 'Gol', value: stats?.goals ?? 0, icon: '⚽' },
               { label: 'Assist', value: stats?.assists ?? 0, icon: '🎯' },
             ].map(({ label, value, icon }) => (
-              <div key={label} className="bg-white rounded-2xl p-3 shadow-sm text-center">
-                <div className="text-xl mb-1">{icon}</div>
-                <p className="text-xl font-bold text-slate-800">{value}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{label}</p>
+              <div key={label} className="bg-white rounded-xl p-2.5 shadow-sm text-center">
+                <div className="text-lg mb-1">{icon}</div>
+                <p className="text-lg font-bold text-slate-800">{value}</p>
+                <p className="text-xs text-slate-400 mt-0.5 leading-tight">{label}</p>
               </div>
             ))}
           </div>
