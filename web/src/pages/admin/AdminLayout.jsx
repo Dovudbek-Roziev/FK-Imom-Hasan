@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import logo from '../../assets/photo_2026-05-24_11-50-47-removebg-preview.png';
+import { LayoutDashboard, UserCog, LogOut } from 'lucide-react';
 
 const nav = [
-  { to: '/admin', label: 'Dashboard', icon: '📊', end: true },
-  { to: '/admin/coaches', label: 'Trenerlar', icon: '👥' },
+  { to: '/admin', label: 'Dashboard', Icon: LayoutDashboard, end: true },
+  { to: '/admin/coaches', label: 'Trenerlar', Icon: UserCog },
 ];
 
 function Sidebar({ onClose }) {
@@ -18,8 +19,8 @@ function Sidebar({ onClose }) {
   return (
     <aside className="flex flex-col h-full w-64 bg-slate-900 text-white">
       <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-700">
-        <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-          <img src={logo} alt="logo" className="w-8 h-8 object-contain" />
+        <div className="w-14 h-14 flex-shrink-0">
+          <img src={logo} alt="logo" className="w-full h-full object-contain drop-shadow-sm" />
         </div>
         <div>
           <p className="font-bold text-sm leading-tight">Imom Hasan FK</p>
@@ -42,7 +43,7 @@ function Sidebar({ onClose }) {
               }`
             }
           >
-            <span>{item.icon}</span>
+            <item.Icon size={18} strokeWidth={1.75} />
             {item.label}
           </NavLink>
         ))}
@@ -60,7 +61,7 @@ function Sidebar({ onClose }) {
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-900/30 transition-colors"
         >
-          <span>🚪</span> Chiqish
+          <LogOut size={18} strokeWidth={1.75} /> Chiqish
         </button>
       </div>
     </aside>

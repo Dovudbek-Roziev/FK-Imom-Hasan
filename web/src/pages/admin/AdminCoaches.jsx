@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import adminApi from '../../api/adminApi';
+import { Star, KeyRound, Ban, CheckCircle2, Trash2, UserPlus, StarOff, X } from 'lucide-react';
 
 const PLANS = [
   { value: 'free', label: 'Bepul', color: 'bg-slate-100 text-slate-600' },
@@ -16,7 +17,7 @@ function Modal({ title, onClose, children }) {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <h3 className="font-semibold text-slate-800">{title}</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl">✕</button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100"><X size={18} strokeWidth={2} /></button>
         </div>
         <div className="p-6">{children}</div>
       </div>
@@ -231,7 +232,7 @@ export default function AdminCoaches() {
           <p className="text-slate-500 text-sm">{coaches.length} ta trener</p>
         </div>
         <button onClick={() => setShowCreate(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700">
-          <span>+</span> Yangi trener
+          <UserPlus size={16} strokeWidth={2} /> Yangi trener
         </button>
       </div>
 
@@ -278,41 +279,43 @@ export default function AdminCoaches() {
               <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 mt-3">
                 <button
                   onClick={() => setGrantCoach(coach)}
-                  className="px-3 py-2 text-xs rounded-lg bg-yellow-100 text-yellow-700 font-medium hover:bg-yellow-200 text-center"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg bg-yellow-100 text-yellow-700 font-medium hover:bg-yellow-200"
                 >
-                  ⭐ Premium
+                  <Star size={13} strokeWidth={2} /> Premium
                 </button>
                 {coach.subscription?.plan !== 'free' && (
                   <button
                     onClick={() => handleRevoke(coach._id)}
                     disabled={revokingId === coach._id}
-                    className="px-3 py-2 text-xs rounded-lg bg-slate-100 text-slate-600 font-medium hover:bg-slate-200 disabled:opacity-60 text-center"
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg bg-slate-100 text-slate-600 font-medium hover:bg-slate-200 disabled:opacity-60"
                   >
-                    Premium bekor
+                    <StarOff size={13} strokeWidth={2} /> Bekor
                   </button>
                 )}
                 <button
                   onClick={() => setPasswordCoach(coach)}
-                  className="px-3 py-2 text-xs rounded-lg bg-blue-100 text-blue-700 font-medium hover:bg-blue-200 text-center"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg bg-blue-100 text-blue-700 font-medium hover:bg-blue-200"
                 >
-                  🔑 Parol
+                  <KeyRound size={13} strokeWidth={2} /> Parol
                 </button>
                 <button
                   onClick={() => handleToggle(coach)}
                   disabled={togglingId === coach._id}
-                  className={`px-3 py-2 text-xs rounded-lg font-medium disabled:opacity-60 text-center ${
+                  className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg font-medium disabled:opacity-60 ${
                     coach.isActive
                       ? 'bg-red-100 text-red-700 hover:bg-red-200'
                       : 'bg-green-100 text-green-700 hover:bg-green-200'
                   }`}
                 >
-                  {coach.isActive ? '🚫 Bloklash' : '✅ Faol'}
+                  {coach.isActive
+                    ? <><Ban size={13} strokeWidth={2} /> Bloklash</>
+                    : <><CheckCircle2 size={13} strokeWidth={2} /> Faol</>}
                 </button>
                 <button
                   onClick={() => setDeleteCoach(coach)}
-                  className="px-3 py-2 text-xs rounded-lg bg-red-600 text-white font-medium hover:bg-red-700 text-center"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs rounded-lg bg-red-600 text-white font-medium hover:bg-red-700"
                 >
-                  🗑️ O'chirish
+                  <Trash2 size={13} strokeWidth={2} /> O'chirish
                 </button>
               </div>
             </div>
