@@ -43,6 +43,7 @@ const coachLogin = async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Coach login xatosi:', error);
     res.status(500).json({ message: 'Server xatosi.', error: error.message });
   }
 };
