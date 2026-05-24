@@ -110,7 +110,14 @@ export default function PlayerPayment() {
           </div>
           <p className="text-3xl font-bold text-slate-800">{(currentPayment.amount || 0).toLocaleString()} so'm</p>
 
-          {currentPayment.status !== 'tolangan' && (
+          {currentPayment.status !== 'tolangan' && currentPayment.notes === 'player_notified' && (
+            <div className="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+              <p className="text-sm font-semibold text-amber-700">⏳ Tasdiqlash kutilmoqda</p>
+              <p className="text-xs text-amber-600 mt-1">Trenerga xabar yuborildi. Trener tasdiqlashini kuting.</p>
+            </div>
+          )}
+
+          {currentPayment.status !== 'tolangan' && currentPayment.notes !== 'player_notified' && (
             <div className="mt-4 space-y-3">
               <p className="text-sm text-slate-500">To'lash usulini tanlang:</p>
 

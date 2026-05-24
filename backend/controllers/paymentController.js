@@ -101,10 +101,10 @@ const confirmPayment = async (req, res) => {
   }
 };
 
-// Futbolchi to'lov qilishi (app orqali)
+// Futbolchi to'lov qilganligini bildirishi (trener tasdiqlashi kerak)
 const makePayment = async (req, res) => {
   try {
-    const { paymentId, paymentMethod, transactionId } = req.body;
+    const { paymentId } = req.body;
 
     const payment = await Payment.findOne({
       _id: paymentId,
@@ -115,19 +115,25 @@ const makePayment = async (req, res) => {
       return res.status(404).json({ message: 'To\'lov topilmadi.' });
     }
 
-    payment.status = 'tolangan';
-    payment.paidDate = new Date();
-    payment.paymentMethod = paymentMethod;
-    payment.transactionId = transactionId;
+    if (payment.status === 'tolangan') {
+      return res.status(400).json({ message: 'Bu to\'lov allaqachon to\'langan.' });
+    }
+
+    if (payment.notes === 'player_notified') {
+      return res.status(400).json({ message: 'Trenerga allaqachon xabar yuborildi. Tasdiqlashini kuting.' });
+    }
+
+    // Faqat xabar belgisi qo'yamiz — trener o'zi tasdiqlashi kerak
+    payment.notes = 'player_notified';
     await payment.save();
 
     // Trenerga bildirishnoma
     const player = await Player.findById(req.playerId);
-    if (payment.coach.fcmToken && player) {
+    if (payment.coach?.fcmToken && player) {
       await sendNotification(
         payment.coach.fcmToken,
-        'To\'lov keldi 💰',
-        `${player.firstName} ${player.lastName} — ${payment.amount.toLocaleString()} so'm to\'ladi.`
+        'To\'lov xabari 💰',
+        `${player.firstName} ${player.lastName} ${payment.amount.toLocaleString()} so\'m to\'laganligini bildirdi. Tasdiqlang.`
       );
     }
 

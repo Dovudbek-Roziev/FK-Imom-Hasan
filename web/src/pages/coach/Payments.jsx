@@ -146,6 +146,9 @@ export default function Payments() {
                   }`}>
                     {p.status === 'tolangan' ? "To'langan" : p.status === 'kechikkan' ? 'Kechikkan' : 'Kutilmoqda'}
                   </span>
+                  {p.notes === 'player_notified' && p.status !== 'tolangan' && (
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-blue-100 text-blue-700">📲 To'ladi</span>
+                  )}
                   {p.month && <span className="text-xs text-slate-500">{monthStr(p)}</span>}
                 </div>
               </div>

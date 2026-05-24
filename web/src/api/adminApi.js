@@ -16,7 +16,7 @@ adminApi.interceptors.response.use(
   (err) => {
     if (err.response?.status === 403) {
       localStorage.removeItem('adminKey');
-      window.location.href = '/admin/login';
+      window.location.href = '/#/login';
     }
     return Promise.reject(err);
   }
