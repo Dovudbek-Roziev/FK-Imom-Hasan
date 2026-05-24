@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/photo_2026-05-24_11-50-47-removebg-preview.png';
-import { Users, Dumbbell, CreditCard, Trophy, LogIn, Settings, TrendingUp, Phone, MapPin, Send, ChevronRight } from 'lucide-react';
+import { Users, Dumbbell, CreditCard, Trophy, LogIn, Settings, TrendingUp, Phone, MapPin, ChevronRight } from 'lucide-react';
 
 function Counter({ target, suffix = '' }) {
   const [count, setCount] = useState(0);
@@ -352,15 +352,11 @@ export default function Landing() {
               <ul className="space-y-3">
                 <li className="flex items-start gap-2.5">
                   <Phone size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-slate-500 text-xs">+998 90 000 00 00</span>
-                </li>
-                <li className="flex items-start gap-2.5">
-                  <Send size={14} className="text-sky-400 mt-0.5 flex-shrink-0" />
-                  <span className="text-slate-500 text-xs">@imomhasan_fk</span>
+                  <span className="text-slate-500 text-xs">+996 755 507 111</span>
                 </li>
                 <li className="flex items-start gap-2.5">
                   <MapPin size={14} className="text-rose-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-slate-500 text-xs">Toshkent, O'zbekiston</span>
+                  <span className="text-slate-500 text-xs">Osh, Qirg'iziston</span>
                 </li>
               </ul>
             </div>
