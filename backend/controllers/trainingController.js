@@ -10,7 +10,7 @@ const getTrainings = async (req, res) => {
     if (team) filter.team = team;
 
     const trainings = await Training.find(filter)
-      .sort({ date: -1 })
+      .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .populate('attendance.player', 'firstName lastName photo position')
@@ -43,9 +43,8 @@ const getTraining = async (req, res) => {
 // Yangi trenirovka yaratish
 const createTraining = async (req, res) => {
   try {
-    const { title, date, startTime, endTime, location, exercises, notes, team } = req.body;
+    const { title, date, days, startTime, endTime, location, exercises, notes, team } = req.body;
 
-    // Jamoa tanlangan bo'lsa faqat shu jamoa futbolchilarini, aks holda hammasini olish
     const playerFilter = { coach: req.coach._id, isActive: true };
     if (team) playerFilter.team = team;
     const players = await Player.find(playerFilter);
@@ -63,7 +62,8 @@ const createTraining = async (req, res) => {
       coach: req.coach._id,
       team: team || null,
       title,
-      date,
+      date: date || null,
+      days: days || [],
       startTime,
       endTime,
       location,
@@ -89,7 +89,7 @@ const createTraining = async (req, res) => {
 // Trenirovkani yangilash (davomat, baholar)
 const updateTraining = async (req, res) => {
   try {
-    const { title, date, startTime, endTime, location, exercises, attendance, status, notes, team } = req.body;
+    const { title, date, days, startTime, endTime, location, exercises, attendance, status, notes, team } = req.body;
 
     const training = await Training.findOne({ _id: req.params.id, coach: req.coach._id });
     if (!training) {
@@ -118,7 +118,7 @@ const updateTraining = async (req, res) => {
 
     const updated = await Training.findByIdAndUpdate(
       req.params.id,
-      { title, date, startTime, endTime, location, exercises, attendance, status, notes, ...(team !== undefined && { team: team || null }) },
+      { title, date: date || null, days: days || [], startTime, endTime, location, exercises, attendance, status, notes, ...(team !== undefined && { team: team || null }) },
       { new: true }
     ).populate('attendance.player', 'firstName lastName photo').populate('team', 'name color');
 
@@ -181,12 +181,16 @@ const getUpcomingTrainings = async (req, res) => {
   try {
     const trainings = await Training.find({
       coach: req.coachId,
-      date: { $gte: new Date() },
-      status: 'rejalashtirilgan'
+      status: 'rejalashtirilgan',
+      $or: [
+        { date: { $gte: new Date() } },
+        { days: { $exists: true, $ne: [] } }
+      ]
     })
-      .sort({ date: 1 })
-      .limit(5)
-      .select('title date startTime endTime location');
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .select('title date days startTime endTime location team')
+      .populate('team', 'name color');
 
     res.json({ success: true, trainings });
   } catch (error) {

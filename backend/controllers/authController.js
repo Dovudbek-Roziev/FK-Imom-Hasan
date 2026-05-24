@@ -67,7 +67,9 @@ const playerLogin = async (req, res) => {
       return res.status(400).json({ message: '6 xonali kod kiritish shart.' });
     }
 
-    const player = await Player.findOne({ accessCode, isActive: true }).populate('coach', 'firstName lastName photo');
+    const player = await Player.findOne({ accessCode, isActive: true })
+      .populate('coach', 'firstName lastName photo')
+      .populate('team', 'name color');
     if (!player) {
       return res.status(401).json({ message: 'Noto\'g\'ri kod. Treneringizdan oling.' });
     }
@@ -86,7 +88,8 @@ const playerLogin = async (req, res) => {
         age: player.age,
         stats: player.stats,
         healthStatus: player.healthStatus,
-        coach: player.coach
+        coach: player.coach,
+        team: player.team
       }
     });
   } catch (error) {

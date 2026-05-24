@@ -40,9 +40,13 @@ const TrainingSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  days: [{
+    type: String,
+    enum: ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba']
+  }],
   date: {
     type: Date,
-    required: true
+    required: false
   },
   startTime: {
     type: String,

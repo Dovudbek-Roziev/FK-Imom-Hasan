@@ -157,4 +157,23 @@ const getMyStats = async (req, res) => {
   }
 };
 
-module.exports = { getDashboardStats, getTeamStats, getIncomeStats, getMyStats };
+// Futbolchi uchun: o'z trenerining top futbolchilari
+const getTopPlayers = async (req, res) => {
+  try {
+    const players = await Player.find({ coach: req.coachId, isActive: true })
+      .select('firstName lastName stats position photo team')
+      .populate('team', 'name color');
+
+    const sorted = [...players].sort((a, b) => {
+      const scoreA = (a.stats.goals * 2) + a.stats.assists + a.stats.trainingsAttended;
+      const scoreB = (b.stats.goals * 2) + b.stats.assists + b.stats.trainingsAttended;
+      return scoreB - scoreA;
+    }).slice(0, 10);
+
+    res.json({ success: true, players: sorted });
+  } catch (error) {
+    res.status(500).json({ message: 'Server xatosi.' });
+  }
+};
+
+module.exports = { getDashboardStats, getTeamStats, getIncomeStats, getMyStats, getTopPlayers };

@@ -17,10 +17,17 @@ const healthLabels = { healthy: "Sog'lom", injured: 'Jarohat', sick: 'Kasal', re
 export default function PlayerHome() {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
+  const [topPlayers, setTopPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/stats/my').then((r) => setStats(r.data.stats || null)).catch(() => {}).finally(() => setLoading(false));
+    Promise.all([
+      api.get('/stats/my'),
+      api.get('/stats/top-players'),
+    ]).then(([myRes, topRes]) => {
+      setStats(myRes.data.stats || null);
+      setTopPlayers(topRes.data.players || []);
+    }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   return (
@@ -47,17 +54,34 @@ export default function PlayerHome() {
           </div>
         </div>
 
-        {user?.coach && (
-          <div className="mt-4 pt-4 border-t border-slate-100 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-sm">
-              {user.coach.firstName?.[0]}
+        <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
+          {user?.team && (
+            <div className="flex items-center gap-3">
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: user.team.color || '#e2e8f0' }}
+              >
+                <span className="text-white font-bold text-sm">{user.team.name?.[0]}</span>
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Jamoa</p>
+                <p className="text-sm font-medium text-slate-800">{user.team.name}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-slate-500">Trener</p>
-              <p className="text-sm font-medium text-slate-800">{user.coach.firstName} {user.coach.lastName}</p>
+          )}
+
+          {user?.coach && (
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-sm flex-shrink-0">
+                {user.coach.firstName?.[0]}
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Trener</p>
+                <p className="text-sm font-medium text-slate-800">{user.coach.firstName} {user.coach.lastName}</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {loading ? (
@@ -97,6 +121,44 @@ export default function PlayerHome() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Top o'yinchilar */}
+      {topPlayers.length > 0 && (
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <h3 className="text-sm font-semibold text-slate-700 mb-4">🏆 Top o'yinchilar</h3>
+          <div className="space-y-3">
+            {topPlayers.map((p, idx) => {
+              const score = (p.stats?.goals || 0) * 2 + (p.stats?.assists || 0) + (p.stats?.trainingsAttended || 0);
+              const isMe = p._id === user?.id;
+              return (
+                <div key={p._id} className={`flex items-center gap-3 p-2 rounded-xl ${isMe ? 'bg-blue-50' : ''}`}>
+                  <span className={`w-6 text-center text-xs font-bold flex-shrink-0 ${idx === 0 ? 'text-yellow-500' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-orange-400' : 'text-slate-400'}`}>
+                    {idx + 1}
+                  </span>
+                  {p.photo ? (
+                    <img src={photoUrl(p.photo)} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                      {p.firstName?.[0]}{p.lastName?.[0]}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm font-medium truncate ${isMe ? 'text-blue-700' : 'text-slate-800'}`}>
+                      {p.firstName} {p.lastName} {isMe && '(Sen)'}
+                    </p>
+                    <p className="text-xs text-slate-400">{p.position}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-sm font-bold text-slate-800">{score}</p>
+                    <p className="text-xs text-slate-400">ball</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-xs text-slate-400 mt-3 text-center">Ball = Gol×2 + Assist + Qatnashish</p>
         </div>
       )}
     </div>

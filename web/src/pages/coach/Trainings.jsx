@@ -23,6 +23,8 @@ const attOptions = [
   { value: 'kelmadi', label: 'Kelmadi', color: 'bg-red-100 text-red-700' },
   { value: 'sababli', label: 'Sababli', color: 'bg-slate-100 text-slate-600' },
 ];
+const DAYS = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];
+const DAY_SHORT = { Dushanba: 'Du', Seshanba: 'Se', Chorshanba: 'Ch', Payshanba: 'Pa', Juma: 'Ju', Shanba: 'Sh', Yakshanba: 'Ya' };
 
 function AttendanceModal({ training, onClose, onSaved }) {
   const [rows, setRows] = useState(
@@ -57,6 +59,7 @@ function AttendanceModal({ training, onClose, onSaved }) {
       await api.put(`/trainings/${training._id}`, {
         title: training.title,
         date: training.date,
+        days: training.days || [],
         startTime: training.startTime,
         endTime: training.endTime,
         location: training.location,
@@ -162,10 +165,13 @@ function AttendanceModal({ training, onClose, onSaved }) {
 }
 
 function TrainingForm({ editItem, teams, onSave, onCancel }) {
+  const isRecurring = editItem ? (editItem.days?.length > 0) : false;
+  const [recurring, setRecurring] = useState(isRecurring);
   const now = new Date();
   const [form, setForm] = useState({
     title: editItem?.title || '',
     date: editItem?.date ? editItem.date.split('T')[0] : now.toISOString().split('T')[0],
+    days: editItem?.days || [],
     startTime: editItem?.startTime || '10:00',
     endTime: editItem?.endTime || '12:00',
     location: editItem?.location || '',
@@ -175,12 +181,32 @@ function TrainingForm({ editItem, teams, onSave, onCancel }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  const toggleDay = (day) => {
+    setForm((prev) => ({
+      ...prev,
+      days: prev.days.includes(day) ? prev.days.filter((d) => d !== day) : [...prev.days, day],
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (recurring && form.days.length === 0) {
+      setError("Kamida 1 ta kun tanlang.");
+      return;
+    }
     setSaving(true);
     setError('');
     try {
-      const payload = { ...form, team: form.team || null };
+      const payload = {
+        title: form.title,
+        startTime: form.startTime,
+        endTime: form.endTime,
+        location: form.location,
+        notes: form.notes,
+        team: form.team || null,
+        days: recurring ? form.days : [],
+        date: recurring ? null : form.date,
+      };
       if (editItem) {
         await api.put(`/trainings/${editItem._id}`, {
           ...payload,
@@ -202,10 +228,12 @@ function TrainingForm({ editItem, teams, onSave, onCancel }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && <p className="text-red-600 text-sm bg-red-50 p-3 rounded-xl">{error}</p>}
+
       <div>
         <label className="lbl">Mashg'ulot nomi</label>
         <input className="inp" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required placeholder="Misol: Texnik mashq" />
       </div>
+
       <div>
         <label className="lbl">Jamoa (ixtiyoriy)</label>
         <select className="inp" value={form.team} onChange={(e) => setForm({ ...form, team: e.target.value })}>
@@ -215,10 +243,55 @@ function TrainingForm({ editItem, teams, onSave, onCancel }) {
           ))}
         </select>
       </div>
+
+      {/* Bir martalik / Doimiy toggle */}
       <div>
-        <label className="lbl">Sana</label>
-        <input className="inp" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
+        <label className="lbl">Mashg'ulot turi</label>
+        <div className="flex rounded-xl border border-slate-200 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setRecurring(false)}
+            className={`flex-1 py-2.5 text-sm font-medium transition-colors ${!recurring ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+          >
+            Bir martalik
+          </button>
+          <button
+            type="button"
+            onClick={() => setRecurring(true)}
+            className={`flex-1 py-2.5 text-sm font-medium transition-colors ${recurring ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+          >
+            Doimiy jadval
+          </button>
+        </div>
       </div>
+
+      {!recurring ? (
+        <div>
+          <label className="lbl">Sana</label>
+          <input className="inp" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required />
+        </div>
+      ) : (
+        <div>
+          <label className="lbl">Hafta kunlari</label>
+          <div className="flex flex-wrap gap-2 mt-1">
+            {DAYS.map((day) => (
+              <button
+                key={day}
+                type="button"
+                onClick={() => toggleDay(day)}
+                className={`px-3 py-1.5 rounded-xl text-sm font-medium border transition-all ${
+                  form.days.includes(day)
+                    ? 'bg-blue-600 text-white border-transparent'
+                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                {day}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="lbl">Boshlanish vaqti</label>
@@ -229,14 +302,17 @@ function TrainingForm({ editItem, teams, onSave, onCancel }) {
           <input className="inp" type="time" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
         </div>
       </div>
+
       <div>
         <label className="lbl">Joy</label>
         <input className="inp" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="Stadion nomi" />
       </div>
+
       <div>
         <label className="lbl">Izoh</label>
         <textarea className="inp resize-none" rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Qo'shimcha ma'lumot..." />
       </div>
+
       <div className="flex gap-3 pt-2">
         <button type="button" onClick={onCancel} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-medium text-sm">
           Bekor
@@ -334,55 +410,83 @@ export default function Trainings() {
         </div>
       ) : (
         <div className="space-y-3">
-          {trainings.map((t) => (
-            <div key={t._id} className="bg-white rounded-2xl p-4 shadow-sm">
-              <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-xl bg-blue-50 flex flex-col items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-bold text-blue-600 text-center leading-tight">
-                    {t.date ? new Date(t.date).toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' }) : '—'}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-semibold text-slate-800">{t.title}</p>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[t.status] || 'bg-slate-100 text-slate-600'}`}>
-                      {statusLabel[t.status] || t.status}
-                    </span>
-                  </div>
-                  {t.team && (
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: t.team.color }} />
-                      <span className="text-xs text-slate-500 font-medium">{t.team.name}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 flex-wrap">
-                    {t.startTime && <span>🕐 {t.startTime}{t.endTime ? ` – ${t.endTime}` : ''}</span>}
-                    {t.location && <span>📍 {t.location}</span>}
-                    {t.attendance?.length > 0 && (
-                      <span>👥 {t.attendance.filter((a) => a.status === 'keldi' || a.status === 'kech_keldi').length}/{t.attendance.length}</span>
+          {trainings.map((t) => {
+            const isRecurring = t.days && t.days.length > 0;
+            return (
+              <div key={t._id} className="bg-white rounded-2xl p-4 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${isRecurring ? 'bg-purple-50' : 'bg-blue-50'}`}>
+                    {isRecurring ? (
+                      <span className="text-lg">🔁</span>
+                    ) : (
+                      <span className="text-xs font-bold text-blue-600 text-center leading-tight">
+                        {t.date ? new Date(t.date).toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' }) : '—'}
+                      </span>
                     )}
                   </div>
-                  {t.notes && <p className="text-xs text-slate-400 mt-1 truncate">{t.notes}</p>}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="font-semibold text-slate-800">{t.title}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[t.status] || 'bg-slate-100 text-slate-600'}`}>
+                        {statusLabel[t.status] || t.status}
+                      </span>
+                      {isRecurring && (
+                        <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">Doimiy</span>
+                      )}
+                    </div>
+
+                    {t.team && (
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: t.team.color }} />
+                        <span className="text-xs text-slate-500 font-medium">{t.team.name}</span>
+                      </div>
+                    )}
+
+                    {/* Kunlar */}
+                    {isRecurring && (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {DAYS.map((day) => (
+                          <span
+                            key={day}
+                            className={`text-xs px-2 py-0.5 rounded-lg font-medium ${
+                              t.days.includes(day) ? 'bg-purple-600 text-white' : 'bg-slate-100 text-slate-300'
+                            }`}
+                          >
+                            {DAY_SHORT[day]}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 flex-wrap">
+                      {t.startTime && <span>🕐 {t.startTime}{t.endTime ? ` – ${t.endTime}` : ''}</span>}
+                      {t.location && <span>📍 {t.location}</span>}
+                      {t.attendance?.length > 0 && (
+                        <span>👥 {t.attendance.filter((a) => a.status === 'keldi' || a.status === 'kech_keldi').length}/{t.attendance.length}</span>
+                      )}
+                    </div>
+                    {t.notes && <p className="text-xs text-slate-400 mt-1 truncate">{t.notes}</p>}
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-3">
+                  {t.status !== 'tugallangan' && (
+                    <button
+                      onClick={() => setAttendanceTraining(t)}
+                      className="flex-1 py-2 text-xs rounded-lg bg-green-50 border border-green-200 text-green-700 hover:bg-green-100 font-medium"
+                    >
+                      Davomat
+                    </button>
+                  )}
+                  <button onClick={() => setEditItem(t)} className="flex-1 py-2 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium">
+                    Tahrirlash
+                  </button>
+                  <button onClick={() => setDeleteId(t._id)} className="flex-1 py-2 text-xs rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-medium">
+                    O'chirish
+                  </button>
                 </div>
               </div>
-              <div className="flex gap-2 mt-3">
-                {t.status !== 'tugallangan' && (
-                  <button
-                    onClick={() => setAttendanceTraining(t)}
-                    className="flex-1 py-2 text-xs rounded-lg bg-green-50 border border-green-200 text-green-700 hover:bg-green-100 font-medium"
-                  >
-                    Davomat
-                  </button>
-                )}
-                <button onClick={() => setEditItem(t)} className="flex-1 py-2 text-xs rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 font-medium">
-                  Tahrirlash
-                </button>
-                <button onClick={() => setDeleteId(t._id)} className="flex-1 py-2 text-xs rounded-lg border border-red-200 text-red-600 hover:bg-red-50 font-medium">
-                  O'chirish
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

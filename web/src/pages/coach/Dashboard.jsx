@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import api from '../../api';
+import api, { photoUrl } from '../../api';
 
 const MONTHS = ['', 'Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyn', 'Iyl', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek'];
 
@@ -19,19 +19,29 @@ function StatCard({ icon, label, value, color }) {
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [incomeStats, setIncomeStats] = useState([]);
+  const [topPlayers, setTopPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       api.get('/stats/dashboard'),
       api.get('/payments/income-stats'),
-    ]).then(([s, inc]) => {
+      api.get('/stats/team'),
+    ]).then(([s, inc, team]) => {
       setStats(s.data.stats || null);
       const monthly = (inc.data.monthlyIncome || []).map((item) => ({
         month: MONTHS[item._id.month] || item._id.month,
         total: item.total,
       }));
       setIncomeStats(monthly);
+
+      const players = team.data.players || [];
+      const sorted = [...players].sort((a, b) => {
+        const scoreA = (a.stats?.goals || 0) * 2 + (a.stats?.assists || 0) + (a.stats?.trainingsAttended || 0);
+        const scoreB = (b.stats?.goals || 0) * 2 + (b.stats?.assists || 0) + (b.stats?.trainingsAttended || 0);
+        return scoreB - scoreA;
+      }).slice(0, 10);
+      setTopPlayers(sorted);
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
@@ -88,7 +98,7 @@ export default function Dashboard() {
                   <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-lg flex-shrink-0">⚽</div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-800 truncate">{t.title}</p>
-                    <p className="text-xs text-slate-500">{new Date(t.date).toLocaleDateString('uz-UZ')}</p>
+                    <p className="text-xs text-slate-500">{t.date ? new Date(t.date).toLocaleDateString('uz-UZ') : '—'}</p>
                   </div>
                   <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                     t.status === 'tugallangan' ? 'bg-green-100 text-green-700' :
@@ -107,6 +117,54 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Top o'yinchilar */}
+      {topPlayers.length > 0 && (
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-slate-700 mb-4">🏆 Top o'yinchilar</h2>
+          <div className="space-y-3">
+            {topPlayers.map((p, idx) => {
+              const score = (p.stats?.goals || 0) * 2 + (p.stats?.assists || 0) + (p.stats?.trainingsAttended || 0);
+              return (
+                <div key={p._id} className="flex items-center gap-3">
+                  <span className={`w-6 text-center text-xs font-bold flex-shrink-0 ${idx === 0 ? 'text-yellow-500' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-orange-400' : 'text-slate-400'}`}>
+                    {idx + 1}
+                  </span>
+                  {p.photo ? (
+                    <img src={photoUrl(p.photo)} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                      {p.firstName?.[0]}{p.lastName?.[0]}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-slate-800 truncate">{p.firstName} {p.lastName}</p>
+                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                      <span>{p.position}</span>
+                      {p.team && (
+                        <>
+                          <span>·</span>
+                          <span className="flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ backgroundColor: p.team.color }} />
+                            {p.team.name}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right flex-shrink-0 space-y-0.5">
+                    <p className="text-sm font-bold text-slate-800">{score} ball</p>
+                    <p className="text-xs text-slate-400">
+                      {p.stats?.goals || 0}G · {p.stats?.assists || 0}A · {p.stats?.trainingsAttended || 0}T
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-xs text-slate-400 mt-3 text-center">Ball = Gol×2 + Assist + Qatnashish soni</p>
+        </div>
+      )}
     </div>
   );
 }
