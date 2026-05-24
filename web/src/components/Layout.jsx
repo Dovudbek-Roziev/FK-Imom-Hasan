@@ -40,14 +40,12 @@ export default function Layout({ children }) {
   const Sidebar = () => (
     <aside className="flex flex-col h-full bg-white border-r border-slate-200 w-64">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200">
-        <div className="w-14 h-14 flex-shrink-0">
-            <img src={logo} alt="logo" className="w-full h-full object-contain drop-shadow-sm" />
-          </div>
-        <div>
-          <p className="font-bold text-slate-800 text-sm leading-tight">FK Imom Hasan</p>
-          <p className="text-xs text-slate-500">{role === 'coach' ? 'Trener paneli' : 'Futbolchi paneli'}</p>
+      <div className="px-6 py-6 border-b border-slate-200 text-center">
+        <div className="w-20 h-20 mx-auto mb-3 rounded-2xl overflow-hidden shadow-lg ring-2 ring-blue-100 bg-white">
+          <img src={logo} alt="logo" className="w-full h-full object-contain" />
         </div>
+        <p className="font-bold text-slate-800 text-sm leading-tight">FK Imom Hasan</p>
+        <p className="text-xs text-slate-500 mt-0.5">{role === 'coach' ? 'Trener paneli' : 'Futbolchi paneli'}</p>
       </div>
 
       {/* Nav */}
