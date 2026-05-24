@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../api';
+import { X, Plus, Clock, MapPin, Users, Repeat, CalendarDays } from 'lucide-react';
 
 function Modal({ title, onClose, children }) {
   return (
@@ -7,7 +8,7 @@ function Modal({ title, onClose, children }) {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
           <h3 className="font-semibold text-slate-800">{title}</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl">✕</button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100"><X size={18} /></button>
         </div>
         <div className="p-6">{children}</div>
       </div>
@@ -106,39 +107,23 @@ function AttendanceModal({ training, onClose, onSaved }) {
                 ))}
               </div>
               {(r.status === 'keldi' || r.status === 'kech_keldi') && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <div>
-                    <label className="text-xs text-slate-500 block mb-1">Gol</label>
-                    <input
-                      type="number" min="0" value={r.goals}
-                      onChange={(e) => update(idx, 'goals', e.target.value)}
-                      className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-blue-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-slate-500 block mb-1">Assist</label>
-                    <input
-                      type="number" min="0" value={r.assists}
-                      onChange={(e) => update(idx, 'assists', e.target.value)}
-                      className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-blue-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-slate-500 block mb-1">Masofa (km)</label>
-                    <input
-                      type="number" min="0" step="0.1" value={r.distance}
-                      onChange={(e) => update(idx, 'distance', e.target.value)}
-                      className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-blue-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-slate-500 block mb-1">Baho (1-10)</label>
-                    <input
-                      type="number" min="1" max="10" value={r.rating}
-                      onChange={(e) => update(idx, 'rating', e.target.value)}
-                      className="w-full px-2 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-blue-400"
-                    />
-                  </div>
+                <div className="grid grid-cols-4 gap-2 mt-1">
+                  {[
+                    { field: 'goals', label: 'Gol', min: 0, step: 1, max: undefined },
+                    { field: 'assists', label: 'Assist', min: 0, step: 1, max: undefined },
+                    { field: 'distance', label: 'km', min: 0, step: 0.1, max: undefined },
+                    { field: 'rating', label: 'Baho', min: 1, step: 1, max: 10 },
+                  ].map(({ field, label, min, step, max }) => (
+                    <div key={field}>
+                      <label className="text-xs text-slate-500 block mb-1 text-center">{label}</label>
+                      <input
+                        type="number" min={min} step={step} max={max}
+                        value={r[field]}
+                        onChange={(e) => update(idx, field, e.target.value)}
+                        className="w-full px-1.5 py-1.5 rounded-lg border border-slate-200 text-sm text-slate-800 text-center focus:outline-none focus:border-blue-400"
+                      />
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -369,7 +354,7 @@ export default function Trainings() {
           <p className="text-slate-500 text-sm">{trainings.length} ta mashg'ulot</p>
         </div>
         <button onClick={() => setShowAdd(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700">
-          <span>+</span> Qo'shish
+          <Plus size={16} strokeWidth={2} /> Qo'shish
         </button>
       </div>
 
@@ -417,7 +402,7 @@ export default function Trainings() {
                 <div className="flex items-start gap-3">
                   <div className={`w-11 h-11 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${isRecurring ? 'bg-purple-50' : 'bg-blue-50'}`}>
                     {isRecurring ? (
-                      <span className="text-lg">🔁</span>
+                      <Repeat size={18} strokeWidth={1.75} className="text-purple-600" />
                     ) : (
                       <span className="text-xs font-bold text-blue-600 text-center leading-tight">
                         {t.date ? new Date(t.date).toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' }) : '—'}
@@ -459,10 +444,23 @@ export default function Trainings() {
                     )}
 
                     <div className="flex items-center gap-3 mt-1 text-xs text-slate-500 flex-wrap">
-                      {t.startTime && <span>🕐 {t.startTime}{t.endTime ? ` – ${t.endTime}` : ''}</span>}
-                      {t.location && <span>📍 {t.location}</span>}
+                      {t.startTime && (
+                        <span className="flex items-center gap-1">
+                          <Clock size={11} strokeWidth={2} />
+                          {t.startTime}{t.endTime ? ` – ${t.endTime}` : ''}
+                        </span>
+                      )}
+                      {t.location && (
+                        <span className="flex items-center gap-1">
+                          <MapPin size={11} strokeWidth={2} />
+                          {t.location}
+                        </span>
+                      )}
                       {t.attendance?.length > 0 && (
-                        <span>👥 {t.attendance.filter((a) => a.status === 'keldi' || a.status === 'kech_keldi').length}/{t.attendance.length}</span>
+                        <span className="flex items-center gap-1">
+                          <Users size={11} strokeWidth={2} />
+                          {t.attendance.filter((a) => a.status === 'keldi' || a.status === 'kech_keldi').length}/{t.attendance.length}
+                        </span>
                       )}
                     </div>
                     {t.notes && <p className="text-xs text-slate-400 mt-1 truncate">{t.notes}</p>}
