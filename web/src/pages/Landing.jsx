@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/photo_2026-05-24_11-50-47-removebg-preview.png';
-import { Users, Dumbbell, CreditCard, Trophy, LogIn, Settings, TrendingUp, Phone, MapPin, ChevronRight } from 'lucide-react';
+import { Users, Dumbbell, CreditCard, Trophy, LogIn, Settings, TrendingUp, Phone, MapPin, ChevronRight, Send } from 'lucide-react';
 
 function Counter({ target, suffix = '' }) {
   const [count, setCount] = useState(0);
@@ -362,11 +362,49 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Bottom bar */}
+          {/* Developer section */}
           <div className="border-t border-white/[0.05]">
-            <div className="max-w-4xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div className="max-w-4xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-slate-700 text-xs">© 2026 FK Imom Hasan. Barcha huquqlar himoyalangan.</p>
-              <p className="text-slate-800 text-xs">Powered by ROZIEV</p>
+              <div className="flex items-center gap-3">
+                <span className="text-slate-600 text-xs">Dasturchi: <span className="text-slate-400 font-medium">Dovudbek Roziev</span></span>
+                <div className="flex items-center gap-2">
+                  {/* Instagram */}
+                  <a
+                    href="https://instagram.com/roz1ev.db"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/[0.05] hover:bg-pink-500/20 border border-white/[0.08] hover:border-pink-500/40 transition-all group"
+                    title="Instagram"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500 group-hover:text-pink-400 transition-colors">
+                      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/>
+                    </svg>
+                  </a>
+                  {/* Telegram */}
+                  <a
+                    href="https://t.me/dovud_IT"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/[0.05] hover:bg-sky-500/20 border border-white/[0.08] hover:border-sky-500/40 transition-all group"
+                    title="Telegram"
+                  >
+                    <Send size={12} className="text-slate-500 group-hover:text-sky-400 transition-colors" />
+                  </a>
+                  {/* GitHub */}
+                  <a
+                    href="https://github.com/Dovudbek-Roziev"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-7 h-7 rounded-lg flex items-center justify-center bg-white/[0.05] hover:bg-slate-400/20 border border-white/[0.08] hover:border-slate-400/40 transition-all group"
+                    title="GitHub"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-slate-500 group-hover:text-slate-300 transition-colors">
+                      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </footer>
