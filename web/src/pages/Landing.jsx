@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/photo_2026-05-24_11-50-47-removebg-preview.png';
-import { Users, Dumbbell, CreditCard, Trophy } from 'lucide-react';
+import { Users, Dumbbell, CreditCard, Trophy, LogIn, Settings, TrendingUp, Phone, MapPin, Send, ChevronRight } from 'lucide-react';
 
 function Counter({ target, suffix = '' }) {
   const [count, setCount] = useState(0);
@@ -80,6 +80,15 @@ export default function Landing() {
           0% { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
+        @keyframes fade-up {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes step-pop {
+          0% { transform: scale(0.7); opacity: 0; }
+          70% { transform: scale(1.08); }
+          100% { transform: scale(1); opacity: 1; }
+        }
         .shimmer-text {
           background: linear-gradient(90deg, #fff 0%, #fff 40%, #93c5fd 50%, #fff 60%, #fff 100%);
           background-size: 200% auto;
@@ -93,6 +102,19 @@ export default function Landing() {
         }
         .card-hover:hover {
           transform: translateY(-6px);
+        }
+        .step-card {
+          transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s ease;
+        }
+        .step-card:hover {
+          transform: translateY(-8px) scale(1.03);
+          box-shadow: 0 20px 40px -10px rgba(59,130,246,0.25);
+        }
+        .step-num {
+          transition: background 0.3s ease, transform 0.3s ease;
+        }
+        .step-card:hover .step-num {
+          transform: scale(1.15);
         }
       `}</style>
 
@@ -220,10 +242,138 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* ── Footer ── */}
-        <div className="relative z-10 text-center pb-8">
-          <p className="text-slate-700 text-xs">© 2026 FK Imom Hasan</p>
+        {/* ── Divider ── */}
+        <div className="relative z-10 mx-auto max-w-4xl px-6 mb-8">
+          <div className="h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
         </div>
+
+        {/* ── Qo'llanma ── */}
+        <div className={`relative z-10 px-6 pb-20 max-w-4xl mx-auto transition-all duration-700 delay-[900ms] ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <p className="text-center text-xs text-slate-600 font-semibold uppercase tracking-widest mb-10">Qo'llanma</p>
+
+          <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-0">
+            {/* connecting line — desktop only */}
+            <div className="hidden sm:block absolute top-8 left-[calc(16.67%)] right-[calc(16.67%)] h-px bg-gradient-to-r from-blue-600/40 via-violet-500/40 to-emerald-500/40 z-0" />
+
+            {[
+              {
+                num: '01',
+                Icon: LogIn,
+                title: 'Kiring',
+                desc: 'Trener yoki futbolchi sifatida tizimga kiring',
+                grad: 'from-blue-500 to-blue-700',
+                delay: '100ms',
+              },
+              {
+                num: '02',
+                Icon: Settings,
+                title: 'Sozlang',
+                desc: 'Jamoangizni tuzing, mashg\'ulotlar va to\'lovlarni belgilang',
+                grad: 'from-violet-500 to-purple-700',
+                delay: '250ms',
+              },
+              {
+                num: '03',
+                Icon: TrendingUp,
+                title: 'Kuzating',
+                desc: 'Statistika, davomat va moliyani real vaqtda nazorat qiling',
+                grad: 'from-emerald-500 to-green-700',
+                delay: '400ms',
+              },
+            ].map(({ num, Icon, title, desc, grad, delay }) => (
+              <div key={num} className="relative z-10 flex-1 w-full sm:w-auto flex flex-col items-center text-center px-4">
+                <div
+                  className={`step-card bg-white/[0.04] border border-white/[0.08] rounded-2xl p-6 w-full cursor-default`}
+                  style={{ animationDelay: delay }}
+                >
+                  <div className={`step-num w-14 h-14 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center mx-auto mb-4 shadow-lg`}>
+                    <Icon size={24} strokeWidth={1.75} className="text-white" />
+                  </div>
+                  <span className="text-[10px] font-black text-slate-600 tracking-[0.2em] mb-1 block">{num}</span>
+                  <h3 className="text-white font-bold text-base mb-2">{title}</h3>
+                  <p className="text-slate-500 text-xs leading-relaxed">{desc}</p>
+                </div>
+                {/* mobile arrow */}
+                <div className="sm:hidden mt-3 mb-1 text-slate-700">
+                  <ChevronRight size={16} className="rotate-90" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Footer ── */}
+        <footer className="relative z-10 border-t border-white/[0.06]">
+          <div className="max-w-4xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-3 gap-10">
+
+            {/* Brand */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl overflow-hidden bg-white/10 ring-1 ring-white/10 flex-shrink-0">
+                  <img src={logo} alt="logo" className="w-full h-full object-contain" />
+                </div>
+                <span className="text-white font-bold text-sm">FK Imom Hasan</span>
+              </div>
+              <p className="text-slate-500 text-xs leading-relaxed">
+                Professional futbol klub boshqaruv tizimi. Trenerlar va futbolchilar uchun qulay platforma.
+              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-emerald-500 text-xs font-medium">Tizim faol</span>
+              </div>
+            </div>
+
+            {/* Links */}
+            <div>
+              <p className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-4">Sahifalar</p>
+              <ul className="space-y-2.5">
+                {[
+                  { label: 'Trener paneli', path: '/dashboard' },
+                  { label: 'Futbolchi paneli', path: '/player/home' },
+                  { label: 'Mashg\'ulotlar', path: '/trainings' },
+                  { label: 'To\'lovlar', path: '/payments' },
+                ].map(({ label, path }) => (
+                  <li key={label}>
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="text-slate-500 text-xs hover:text-blue-400 transition-colors flex items-center gap-1.5 group"
+                    >
+                      <ChevronRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity -ml-2 group-hover:ml-0 text-blue-400" />
+                      {label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <p className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-4">Aloqa</p>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-2.5">
+                  <Phone size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-500 text-xs">+998 90 000 00 00</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <Send size={14} className="text-sky-400 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-500 text-xs">@imomhasan_fk</span>
+                </li>
+                <li className="flex items-start gap-2.5">
+                  <MapPin size={14} className="text-rose-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-500 text-xs">Toshkent, O'zbekiston</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="border-t border-white/[0.05]">
+            <div className="max-w-4xl mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+              <p className="text-slate-700 text-xs">© 2026 FK Imom Hasan. Barcha huquqlar himoyalangan.</p>
+              <p className="text-slate-800 text-xs">Powered by ROZIEV</p>
+            </div>
+          </div>
+        </footer>
 
       </div>
     </>
