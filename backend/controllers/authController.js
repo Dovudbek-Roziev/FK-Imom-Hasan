@@ -5,7 +5,7 @@ const Player = require('../models/Player');
 // JWT token yaratish
 const generateToken = (id, role, extra = {}) => {
   return jwt.sign({ id, role, ...extra }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE
+    expiresIn: process.env.JWT_EXPIRE || '7d'
   });
 };
 
