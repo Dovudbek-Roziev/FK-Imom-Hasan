@@ -91,9 +91,9 @@ const services = [
 
 function DeveloperPromo({ navigate }) {
   return (
-    <div className="relative z-10 px-6 py-16 max-w-4xl mx-auto">
-      <div className="relative p-px rounded-3xl dev-card-border">
-        <div className="bg-slate-950 rounded-3xl p-8 sm:p-10 overflow-hidden relative">
+    <div className="relative z-10 px-4 sm:px-6 py-10 sm:py-16 max-w-4xl mx-auto">
+      <div className="relative p-px rounded-2xl sm:rounded-3xl dev-card-border">
+        <div className="bg-slate-950 rounded-2xl sm:rounded-3xl p-5 sm:p-10 overflow-hidden relative">
 
           {/* bg decoration */}
           <div className="absolute top-0 right-0 w-80 h-80 bg-violet-700/10 rounded-full blur-3xl pointer-events-none" />
@@ -161,7 +161,7 @@ function DeveloperPromo({ navigate }) {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 {projects.map(({ name, desc, lang, color, stars }) => (
                   <a
                     key={name}
@@ -406,7 +406,7 @@ export default function Landing() {
             <img
               src={logo}
               alt="logo"
-              className="w-44 h-44 object-contain"
+              className="w-28 h-28 sm:w-44 sm:h-44 object-contain"
               style={{ animation: v ? 'glow-pulse 3s ease-in-out infinite' : 'none' }}
             />
           </div>
@@ -417,7 +417,7 @@ export default function Landing() {
           </h1>
 
           {/* Tagline */}
-          <p className={`mt-4 text-slate-400 text-base sm:text-lg max-w-lg leading-relaxed transition-all duration-700 delay-300 ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <p className={`mt-4 text-slate-400 text-sm sm:text-lg max-w-lg leading-relaxed transition-all duration-700 delay-300 ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             Professional futbol klub boshqaruv tizimi — trenerlar, futbolchilar va to'lovlarni bir joyda boshqaring
           </p>
 
@@ -436,17 +436,17 @@ export default function Landing() {
           </div>
 
           {/* Stats */}
-          <div className={`mt-16 grid grid-cols-3 gap-8 sm:gap-20 transition-all duration-700 delay-[600ms] ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className={`mt-10 sm:mt-16 grid grid-cols-3 gap-4 sm:gap-20 transition-all duration-700 delay-[600ms] ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             {[
               { label: 'Futbolchi', target: 50, suffix: '+' },
               { label: "Mashg'ulot", target: 200, suffix: '+' },
               { label: 'Trener', target: 10, suffix: '+' },
             ].map((s) => (
               <div key={s.label} className="text-center">
-                <p className="text-3xl sm:text-5xl font-black text-white tabular-nums">
+                <p className="text-2xl sm:text-5xl font-black text-white tabular-nums">
                   <Counter target={s.target} suffix={s.suffix} />
                 </p>
-                <p className="text-slate-500 text-xs sm:text-sm mt-1.5 font-medium">{s.label}</p>
+                <p className="text-slate-500 text-[10px] sm:text-sm mt-1 font-medium">{s.label}</p>
               </div>
             ))}
           </div>
