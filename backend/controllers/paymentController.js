@@ -1,5 +1,6 @@
 const Payment = require('../models/Payment');
 const Player = require('../models/Player');
+const Coach = require('../models/Coach');
 const { sendNotification } = require('./notificationController');
 
 // Barcha to'lovlarni olish (trener uchun)
@@ -213,7 +214,62 @@ const getMyPayments = async (req, res) => {
   }
 };
 
+// Barcha futbolchilar uchun bir oylik to'lovni belgilash
+const setFeeForAll = async (req, res) => {
+  try {
+    const { amount, month, year } = req.body;
+    const coachId = req.coach._id;
+    const now = new Date();
+    const m = Number(month) || (now.getMonth() + 1);
+    const y = Number(year) || now.getFullYear();
+    const amt = Number(amount);
+
+    if (!amt || amt <= 0) {
+      return res.status(400).json({ message: "To'lov miqdori kiritilishi shart." });
+    }
+
+    const players = await Player.find({ coach: coachId, isActive: true });
+    if (!players.length) {
+      return res.status(400).json({ message: 'Aktiv futbolchilar topilmadi.' });
+    }
+
+    const dueDate = new Date(y, m - 1, 5);
+
+    // Har bir futbolchi uchun upsert: yangi yozuv yaratilsa status='tolmagan',
+    // mavjud bo'lsa faqat amount va dueDate yangilanadi (status o'zgarmaydi)
+    const ops = players.map(p => ({
+      updateOne: {
+        filter: { player: p._id, month: m, year: y, coach: coachId },
+        update: {
+          $set: { amount: amt, dueDate },
+          $setOnInsert: { player: p._id, month: m, year: y, coach: coachId, status: 'tolmagan' }
+        },
+        upsert: true
+      }
+    }));
+
+    await Payment.bulkWrite(ops);
+    await Coach.findByIdAndUpdate(coachId, { monthlyFee: amt });
+
+    res.json({ success: true, count: players.length });
+  } catch (error) {
+    res.status(500).json({ message: 'Server xatosi.', error: error.message });
+  }
+};
+
+// Futbolchi uchun: o'z trenerining karta va WhatsApp ma'lumotlari
+const getCoachPaymentInfo = async (req, res) => {
+  try {
+    const coach = await Coach.findById(req.coachId)
+      .select('firstName lastName cardNumber whatsappNumber monthlyFee');
+    if (!coach) return res.status(404).json({ message: 'Trener topilmadi.' });
+    res.json({ success: true, coach });
+  } catch (error) {
+    res.status(500).json({ message: 'Server xatosi.' });
+  }
+};
+
 module.exports = {
-  getPayments, setMonthlyFee, confirmPayment,
-  makePayment, sendReminder, checkOverduePayments, getMyPayments
+  getPayments, setMonthlyFee, setFeeForAll, confirmPayment,
+  makePayment, sendReminder, checkOverduePayments, getMyPayments, getCoachPaymentInfo
 };

@@ -23,8 +23,9 @@ export default function Payments() {
   const [loading, setLoading] = useState(true);
   const [confirmId, setConfirmId] = useState(null);
   const [feeModal, setFeeModal] = useState(false);
-  const [feeForm, setFeeForm] = useState({ playerId: '', amount: '', month: new Date().getMonth() + 1, year: new Date().getFullYear() });
+  const [feeForm, setFeeForm] = useState({ amount: '', month: new Date().getMonth() + 1, year: new Date().getFullYear() });
   const [feeSaving, setFeeSaving] = useState(false);
+  const [feeMsg, setFeeMsg] = useState('');
   const [filter, setFilter] = useState('all');
 
   const now = new Date();
@@ -49,24 +50,26 @@ export default function Payments() {
   };
 
   const openFeeModal = () => {
-    setFeeForm({ playerId: players[0]?._id || '', amount: '', month: now.getMonth() + 1, year: now.getFullYear() });
+    setFeeForm({ amount: '', month: now.getMonth() + 1, year: now.getFullYear() });
+    setFeeMsg('');
     setFeeModal(true);
   };
 
   const handleSetFee = async (e) => {
     e.preventDefault();
     setFeeSaving(true);
+    setFeeMsg('');
     try {
-      await api.post('/payments/set-fee', {
-        playerId: feeForm.playerId,
+      const res = await api.post('/payments/set-fee-all', {
         amount: Number(feeForm.amount),
         month: Number(feeForm.month),
         year: Number(feeForm.year),
-        dueDay: 5,
       });
-      setFeeModal(false);
+      setFeeMsg(`${res.data.count} ta futbolchi uchun to'lov belgilandi!`);
       load();
-    } catch {}
+    } catch (err) {
+      setFeeMsg(err.response?.data?.message || 'Xato yuz berdi.');
+    }
     setFeeSaving(false);
   };
 
@@ -173,30 +176,27 @@ export default function Payments() {
       )}
 
       {feeModal && (
-        <Modal title="To'lov belgilash" onClose={() => setFeeModal(false)}>
+        <Modal title="Oylik to'lov belgilash" onClose={() => setFeeModal(false)}>
           <form onSubmit={handleSetFee} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Futbolchi</label>
-              <select
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 text-slate-800"
-                value={feeForm.playerId}
-                onChange={(e) => setFeeForm({ ...feeForm, playerId: e.target.value })}
-                required
-              >
-                {players.map((pl) => (
-                  <option key={pl._id} value={pl._id}>{pl.firstName} {pl.lastName}</option>
-                ))}
-              </select>
+            <div className="bg-blue-50 rounded-xl p-3 text-sm text-blue-700">
+              Barcha aktiv futbolchilar uchun bir vaqtda to'lov belgilanadi
             </div>
+
+            {feeMsg && (
+              <div className={`p-3 rounded-xl text-sm ${feeMsg.includes('ta futbolchi') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                {feeMsg}
+              </div>
+            )}
+
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Miqdor (so'm)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Oylik miqdor (so'm)</label>
               <input
                 type="number"
                 value={feeForm.amount}
                 onChange={(e) => setFeeForm({ ...feeForm, amount: e.target.value })}
                 placeholder="500000"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 text-slate-800"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 text-slate-800 text-lg font-semibold"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -227,7 +227,7 @@ export default function Payments() {
             <div className="flex gap-3">
               <button type="button" onClick={() => setFeeModal(false)} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-sm font-medium">Bekor</button>
               <button type="submit" disabled={feeSaving} className="flex-1 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-60">
-                {feeSaving ? 'Saqlanmoqda...' : 'Saqlash'}
+                {feeSaving ? 'Belgilanmoqda...' : 'Hammasi uchun belgilash'}
               </button>
             </div>
           </form>

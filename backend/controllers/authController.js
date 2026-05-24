@@ -150,4 +150,31 @@ const changePassword = async (req, res) => {
   }
 };
 
-module.exports = { coachLogin, playerLogin, updateFcmToken, changePassword };
+// Trener o'z profilini olish (karta, WhatsApp ma'lumotlari bilan)
+const getCoachProfile = async (req, res) => {
+  try {
+    const coach = await Coach.findById(req.coach._id)
+      .select('-password -fcmToken');
+    if (!coach) return res.status(404).json({ message: 'Topilmadi.' });
+    res.json({ success: true, coach });
+  } catch (error) {
+    res.status(500).json({ message: 'Server xatosi.' });
+  }
+};
+
+// Trener to'lov ma'lumotlarini yangilash (karta, WhatsApp, oylik fee)
+const updatePaymentInfo = async (req, res) => {
+  try {
+    const { cardNumber, whatsappNumber, monthlyFee } = req.body;
+    await Coach.findByIdAndUpdate(req.coach._id, {
+      cardNumber: cardNumber || '',
+      whatsappNumber: whatsappNumber || '',
+      ...(monthlyFee !== undefined && { monthlyFee: Number(monthlyFee) || 0 })
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ message: 'Server xatosi.' });
+  }
+};
+
+module.exports = { coachLogin, playerLogin, updateFcmToken, changePassword, updatePaymentInfo, getCoachProfile };

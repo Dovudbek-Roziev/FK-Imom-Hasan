@@ -47,6 +47,10 @@ const CoachSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  // To'lov ma'lumotlari
+  cardNumber: { type: String, default: '' },
+  whatsappNumber: { type: String, default: '' },
+  monthlyFee: { type: Number, default: 0 },
   // Admin tomonidan yaratilgan
   createdByAdmin: {
     type: Boolean,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api, { photoUrl } from '../../api';
@@ -13,6 +13,24 @@ export default function CoachProfile() {
   const [passSaving, setPassSaving] = useState(false);
   const [passMsg, setPassMsg] = useState('');
   const [showPassForm, setShowPassForm] = useState(false);
+
+  const [payInfo, setPayInfo] = useState({ cardNumber: '', whatsappNumber: '', monthlyFee: '' });
+  const [payInfoSaving, setPayInfoSaving] = useState(false);
+  const [payInfoMsg, setPayInfoMsg] = useState('');
+  const [showPayInfo, setShowPayInfo] = useState(false);
+
+  useEffect(() => {
+    api.get('/auth/me').then(r => {
+      if (r.data?.coach) {
+        const c = r.data.coach;
+        setPayInfo({
+          cardNumber: c.cardNumber || '',
+          whatsappNumber: c.whatsappNumber || '',
+          monthlyFee: c.monthlyFee || ''
+        });
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -43,6 +61,24 @@ export default function CoachProfile() {
       setPassMsg(err.response?.data?.message || 'Xato yuz berdi.');
     } finally {
       setPassSaving(false);
+    }
+  };
+
+  const handleSavePayInfo = async (e) => {
+    e.preventDefault();
+    setPayInfoSaving(true);
+    setPayInfoMsg('');
+    try {
+      await api.put('/auth/update-payment-info', {
+        cardNumber: payInfo.cardNumber,
+        whatsappNumber: payInfo.whatsappNumber,
+        monthlyFee: Number(payInfo.monthlyFee) || 0
+      });
+      setPayInfoMsg('Saqlandi!');
+    } catch {
+      setPayInfoMsg('Xato yuz berdi.');
+    } finally {
+      setPayInfoSaving(false);
     }
   };
 
@@ -89,6 +125,82 @@ export default function CoachProfile() {
             {isSubActive ? 'Faol' : 'Faol emas'}
           </span>
         </div>
+      </div>
+
+      {/* To'lov ma'lumotlari */}
+      <div className="bg-white rounded-2xl p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-slate-700">To'lov ma'lumotlari</h3>
+          <button
+            onClick={() => { setShowPayInfo(!showPayInfo); setPayInfoMsg(''); }}
+            className="text-xs text-blue-600 font-medium hover:underline"
+          >
+            {showPayInfo ? 'Yopish' : "Ko'rish / O'zgartirish"}
+          </button>
+        </div>
+
+        <div className="text-xs text-slate-500 space-y-1">
+          {payInfo.cardNumber ? (
+            <p>Karta: <span className="font-mono font-semibold text-slate-700">{payInfo.cardNumber}</span></p>
+          ) : <p className="text-orange-500">Karta raqami kiritilmagan</p>}
+          {payInfo.whatsappNumber ? (
+            <p>WhatsApp: <span className="font-semibold text-slate-700">{payInfo.whatsappNumber}</span></p>
+          ) : <p className="text-orange-500">WhatsApp raqami kiritilmagan</p>}
+          {payInfo.monthlyFee ? (
+            <p>Oylik to'lov: <span className="font-semibold text-slate-700">{Number(payInfo.monthlyFee).toLocaleString()} so'm</span></p>
+          ) : <p className="text-orange-500">Oylik miqdor belgilanmagan</p>}
+        </div>
+
+        {payInfoMsg && (
+          <p className={`text-xs mt-3 p-2 rounded-lg ${payInfoMsg === 'Saqlandi!' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+            {payInfoMsg}
+          </p>
+        )}
+
+        {showPayInfo && (
+          <form onSubmit={handleSavePayInfo} className="space-y-3 mt-4">
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Bank karta raqami</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="8600 1234 5678 9012"
+                value={payInfo.cardNumber}
+                onChange={(e) => setPayInfo({ ...payInfo, cardNumber: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 font-mono focus:outline-none focus:border-blue-400"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1">WhatsApp raqami</label>
+              <input
+                type="text"
+                inputMode="tel"
+                placeholder="+998901234567"
+                value={payInfo.whatsappNumber}
+                onChange={(e) => setPayInfo({ ...payInfo, whatsappNumber: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-blue-400"
+              />
+              <p className="text-xs text-slate-400 mt-1">Xalqaro format: +998901234567</p>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-600 mb-1">Oylik to'lov miqdori (so'm)</label>
+              <input
+                type="number"
+                placeholder="500000"
+                value={payInfo.monthlyFee}
+                onChange={(e) => setPayInfo({ ...payInfo, monthlyFee: e.target.value })}
+                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-800 focus:outline-none focus:border-blue-400"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={payInfoSaving}
+              className="w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:opacity-60"
+            >
+              {payInfoSaving ? 'Saqlanmoqda...' : 'Saqlash'}
+            </button>
+          </form>
+        )}
       </div>
 
       {/* Change password */}
