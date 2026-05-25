@@ -5,7 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import logo from '../assets/photo_2026-05-24_11-50-47-removebg-preview.png';
 import {
   LayoutDashboard, Users, Shield, Dumbbell, CreditCard,
-  BarChart2, Star, Settings, User, Calendar, Wallet, LogOut, Sun, Moon,
+  BarChart2, Star, Settings, User, Calendar, Wallet, LogOut, Sun, Moon, Trophy,
 } from 'lucide-react';
 
 export default function Layout({ children }) {
@@ -19,6 +19,7 @@ export default function Layout({ children }) {
     { to: '/players', label: t.nav.players, icon: Users },
     { to: '/teams', label: t.nav.teams, icon: Shield },
     { to: '/trainings', label: t.nav.trainings, icon: Dumbbell },
+    { to: '/matches', label: t.nav.matches, icon: Trophy },
     { to: '/payments', label: t.nav.payments, icon: CreditCard },
     { to: '/stats', label: t.nav.stats, icon: BarChart2 },
     { to: '/subscription', label: t.nav.subscription, icon: Star },
@@ -28,6 +29,7 @@ export default function Layout({ children }) {
   const playerNav = [
     { to: '/player/home', label: t.nav.playerHome, icon: User },
     { to: '/player/trainings', label: t.nav.playerTrainings, icon: Calendar },
+    { to: '/player/matches', label: t.nav.playerMatches, icon: Trophy },
     { to: '/player/payment', label: t.nav.playerPayment, icon: Wallet },
   ];
 

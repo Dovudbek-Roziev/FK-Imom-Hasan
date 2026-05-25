@@ -16,6 +16,8 @@ import Subscription from './pages/coach/Subscription';
 import PlayerHome from './pages/player/Home';
 import PlayerTrainings from './pages/player/Trainings';
 import PlayerPayment from './pages/player/Payment';
+import PlayerMatches from './pages/player/Matches';
+import CoachMatches from './pages/coach/Matches';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminCoaches from './pages/admin/AdminCoaches';
@@ -83,6 +85,11 @@ function AppRoutes() {
           <Layout><Subscription /></Layout>
         </ProtectedRoute>
       } />
+      <Route path="/matches" element={
+        <ProtectedRoute requiredRole="coach">
+          <Layout><CoachMatches /></Layout>
+        </ProtectedRoute>
+      } />
 
       {/* Player routes */}
       <Route path="/player/home" element={
@@ -98,6 +105,11 @@ function AppRoutes() {
       <Route path="/player/payment" element={
         <ProtectedRoute requiredRole="player">
           <Layout><PlayerPayment /></Layout>
+        </ProtectedRoute>
+      } />
+      <Route path="/player/matches" element={
+        <ProtectedRoute requiredRole="player">
+          <Layout><PlayerMatches /></Layout>
         </ProtectedRoute>
       } />
 
