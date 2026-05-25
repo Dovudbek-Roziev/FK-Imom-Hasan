@@ -1,102 +1,102 @@
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
+import { Check, X } from 'lucide-react';
 
-const PLANS = [
-  {
-    key: 'free',
-    label: 'Bepul',
-    price: '$0',
-    color: 'border-slate-200 bg-white',
-    badge: 'bg-slate-100 text-slate-600',
-    features: ['30 ta futbolchi', 'Mashg\'ulot jadvali', 'Davomat belgilash', 'To\'lov nazorati'],
-    missing: ['Cheksiz futbolchilar', 'PDF hisobot', 'Prioritet qo\'llab-quvvatlash'],
-  },
-  {
-    key: 'premium_5',
-    label: 'Premium',
-    price: '$5/oy',
-    color: 'border-blue-500 bg-blue-50',
-    badge: 'bg-blue-100 text-blue-700',
-    features: ['Cheksiz futbolchilar', 'Mashg\'ulot jadvali', 'Davomat belgilash', 'To\'lov nazorati', 'Jamoa statistikasi'],
-    missing: ['PDF hisobot', 'Prioritet qo\'llab-quvvatlash'],
-    recommended: true,
-  },
-  {
-    key: 'premium_10',
-    label: 'Premium Pro',
-    price: '$10/oy',
-    color: 'border-purple-500 bg-purple-50',
-    badge: 'bg-purple-100 text-purple-700',
-    features: ['Cheksiz futbolchilar', 'Mashg\'ulot jadvali', 'Davomat belgilash', 'To\'lov nazorati', 'Jamoa statistikasi', 'PDF hisobot', 'Prioritet qo\'llab-quvvatlash'],
-    missing: [],
-  },
-];
+const PLAN_KEYS = ['free', 'premium_5', 'premium_10'];
+const PLAN_PRICES = { free: '$0', premium_5: '$5/oy', premium_10: '$10/oy' };
+const PLAN_RECOMMENDED = { premium_5: true };
+const PLAN_ACCENT = {
+  free: { border: 'border-slate-300', darkBorder: 'border-slate-600', badge: 'bg-slate-100 text-slate-600', darkBadge: 'bg-slate-700 text-slate-300' },
+  premium_5: { border: 'border-blue-400', darkBorder: 'border-blue-500', badge: 'bg-blue-100 text-blue-700', darkBadge: 'bg-blue-500/20 text-blue-400' },
+  premium_10: { border: 'border-purple-400', darkBorder: 'border-purple-500', badge: 'bg-purple-100 text-purple-700', darkBadge: 'bg-purple-500/20 text-purple-400' },
+};
 
 export default function Subscription() {
   const { user } = useAuth();
+  const { dark, t } = useTheme();
+  const ts = t.subscription;
+
   const sub = user?.subscription;
   const currentPlan = sub?.plan || 'free';
   const isActive = sub?.isActive && sub?.endDate && new Date(sub.endDate) > new Date();
   const endDate = sub?.endDate ? new Date(sub.endDate).toLocaleDateString('uz-UZ') : null;
 
+  const card = dark ? 'bg-slate-900 ring-1 ring-white/10' : 'bg-white shadow-sm';
+  const textMain = dark ? 'text-white' : 'text-slate-800';
+  const textSub = dark ? 'text-slate-400' : 'text-slate-500';
+
   return (
     <div className="space-y-5 max-w-xl">
-      <h1 className="text-xl font-bold text-slate-800">Obuna</h1>
+      <h1 className={`text-xl font-bold ${textMain}`}>{ts.title}</h1>
 
-      {/* Joriy holat */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm">
-        <h3 className="text-sm font-semibold text-slate-700 mb-3">Joriy obuna</h3>
+      {/* Current status */}
+      <div className={`${card} rounded-2xl p-5`}>
+        <h3 className={`text-sm font-semibold mb-3 ${dark ? 'text-slate-300' : 'text-slate-700'}`}>{ts.current}</h3>
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-semibold text-slate-800 text-base">
-              {PLANS.find((p) => p.key === currentPlan)?.label || 'Bepul'}
-            </p>
+            <p className={`font-semibold ${textMain}`}>{ts.plans[currentPlan]?.label}</p>
             {isActive && endDate && (
-              <p className="text-xs text-slate-500 mt-0.5">Amal qilish muddati: {endDate}</p>
+              <p className={`text-xs mt-0.5 ${textSub}`}>{ts.expires} {endDate}</p>
             )}
             {!isActive && currentPlan !== 'free' && (
-              <p className="text-xs text-red-500 mt-0.5">Obuna muddati tugagan</p>
+              <p className="text-xs text-red-400 mt-0.5">{ts.expired}</p>
             )}
           </div>
           <span className={`text-xs px-3 py-1 rounded-full font-medium ${
-            isActive ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'
+            isActive
+              ? dark ? 'bg-green-500/20 text-green-400' : 'bg-green-100 text-green-700'
+              : dark ? 'bg-slate-700 text-slate-400' : 'bg-slate-100 text-slate-500'
           }`}>
-            {isActive ? 'Faol' : 'Faol emas'}
+            {isActive ? ts.active : ts.inactive}
           </span>
         </div>
       </div>
 
-      {/* Planlar */}
+      {/* Plans */}
       <div className="space-y-3">
-        {PLANS.map((plan) => {
-          const isCurrent = plan.key === currentPlan;
+        {PLAN_KEYS.map((key) => {
+          const plan = ts.plans[key];
+          const isCurrent = key === currentPlan;
+          const accent = PLAN_ACCENT[key];
+          const isRec = PLAN_RECOMMENDED[key];
+
           return (
             <div
-              key={plan.key}
-              className={`rounded-2xl border-2 p-5 shadow-sm transition-all ${plan.color} ${isCurrent ? 'ring-2 ring-offset-1 ring-blue-500' : ''}`}
+              key={key}
+              className={`rounded-2xl border-2 p-5 transition-all ${
+                dark
+                  ? `${accent.darkBorder} ${isCurrent ? 'bg-slate-800/80' : 'bg-slate-900/60'}`
+                  : `${accent.border} ${isCurrent ? 'bg-white' : 'bg-white/70'}`
+              } ${isCurrent ? 'ring-2 ring-blue-500/40 ring-offset-1' : ''}`}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-bold text-slate-800">{plan.label}</h3>
-                  {plan.recommended && (
-                    <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">Tavsiya</span>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className={`font-bold text-base ${textMain}`}>{plan?.label}</h3>
+                  {isRec && (
+                    <span className="text-xs bg-blue-600 text-white px-2.5 py-0.5 rounded-full font-medium">{ts.recommended}</span>
                   )}
                   {isCurrent && (
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${plan.badge}`}>Joriy</span>
+                    <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${dark ? accent.darkBadge : accent.badge}`}>{ts.currentBadge}</span>
                   )}
                 </div>
-                <span className="font-bold text-slate-700">{plan.price}</span>
+                <span className={`font-bold text-base ${textMain}`}>{PLAN_PRICES[key]}</span>
               </div>
-              <div className="space-y-1.5">
-                {plan.features.map((f) => (
-                  <div key={f} className="flex items-center gap-2 text-sm text-slate-700">
-                    <span className="text-green-500 font-bold">✓</span>
-                    {f}
+
+              <div className="space-y-2">
+                {plan?.features?.map((f) => (
+                  <div key={f} className="flex items-center gap-2.5 text-sm">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${dark ? 'bg-green-500/20' : 'bg-green-100'}`}>
+                      <Check size={11} className={dark ? 'text-green-400' : 'text-green-600'} strokeWidth={2.5} />
+                    </div>
+                    <span className={dark ? 'text-slate-300' : 'text-slate-700'}>{f}</span>
                   </div>
                 ))}
-                {plan.missing.map((f) => (
-                  <div key={f} className="flex items-center gap-2 text-sm text-slate-400">
-                    <span className="font-bold">✕</span>
-                    {f}
+                {plan?.missing?.map((f) => (
+                  <div key={f} className="flex items-center gap-2.5 text-sm">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${dark ? 'bg-slate-800' : 'bg-slate-100'}`}>
+                      <X size={11} className={dark ? 'text-slate-600' : 'text-slate-400'} strokeWidth={2.5} />
+                    </div>
+                    <span className={textSub}>{f}</span>
                   </div>
                 ))}
               </div>
@@ -105,13 +105,11 @@ export default function Subscription() {
         })}
       </div>
 
-      {/* Yuksaltirish */}
+      {/* Upgrade CTA */}
       {currentPlan === 'free' && (
-        <div className="bg-blue-600 rounded-2xl p-5 text-white shadow-sm">
-          <h3 className="font-bold text-lg mb-1">Premiumga o'ting</h3>
-          <p className="text-blue-100 text-sm mb-4">
-            Cheksiz futbolchi qo'shish va qo'shimcha imkoniyatlar uchun admin bilan bog'laning.
-          </p>
+        <div className="rounded-2xl p-5 bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-lg">
+          <h3 className="font-bold text-lg mb-1">{ts.upgradeTo}</h3>
+          <p className="text-blue-100 text-sm mb-4">{ts.upgradeDesc}</p>
           <div className="flex gap-3">
             <a
               href="https://t.me/dovud_IT"
@@ -119,29 +117,29 @@ export default function Subscription() {
               rel="noopener noreferrer"
               className="flex-1 py-2.5 rounded-xl bg-white text-blue-600 text-sm font-semibold text-center hover:bg-blue-50 transition-colors"
             >
-              Telegram orqali
+              {ts.telegram}
             </a>
             <a
-              href="tel:+998901234567"
-              className="flex-1 py-2.5 rounded-xl border border-blue-400 text-white text-sm font-semibold text-center hover:bg-blue-700 transition-colors"
+              href="tel:+996700000000"
+              className="flex-1 py-2.5 rounded-xl border border-white/30 text-white text-sm font-semibold text-center hover:bg-white/10 transition-colors"
             >
-              Qo'ng'iroq qilish
+              {ts.call}
             </a>
           </div>
         </div>
       )}
 
       {currentPlan !== 'free' && !isActive && (
-        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-5 shadow-sm">
-          <h3 className="font-semibold text-orange-800 mb-1">Obuna yangilash kerak</h3>
-          <p className="text-orange-700 text-sm mb-3">Obunangiz muddati tugagan. Davom ettirish uchun admin bilan bog'laning.</p>
+        <div className={`rounded-2xl p-5 border ${dark ? 'bg-orange-500/10 border-orange-500/30' : 'bg-orange-50 border-orange-200'}`}>
+          <h3 className={`font-semibold mb-1 ${dark ? 'text-orange-300' : 'text-orange-800'}`}>{ts.renewTitle}</h3>
+          <p className={`text-sm mb-3 ${dark ? 'text-orange-400' : 'text-orange-700'}`}>{ts.renewDesc}</p>
           <a
             href="https://t.me/dovud_IT"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block py-2.5 px-5 rounded-xl bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors"
           >
-            Telegram orqali bog'lanish
+            {ts.renewBtn}
           </a>
         </div>
       )}

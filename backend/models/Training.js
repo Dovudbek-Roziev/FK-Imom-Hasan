@@ -21,7 +21,12 @@ const AttendanceSchema = new mongoose.Schema({
   goals: { type: Number, default: 0 },
   assists: { type: Number, default: 0 },
   distance: { type: Number, default: 0 }, // km
-  notes: { type: String, default: '' }
+  notes: { type: String, default: '' },
+  playerResponse: {
+    type: String,
+    enum: ['kelaman', 'kelmayman', null],
+    default: null
+  },
 });
 
 const TrainingSchema = new mongoose.Schema({
@@ -85,7 +90,7 @@ const TrainingSchema = new mongoose.Schema({
 
 // Kelganlar soni
 TrainingSchema.virtual('presentCount').get(function() {
-  return this.attendance.filter(a => a.status === 'keldi' || a.status === 'kech_keldi').length;
+  return (this.attendance || []).filter(a => a.status === 'keldi' || a.status === 'kech_keldi').length;
 });
 
 TrainingSchema.set('toJSON', { virtuals: true });

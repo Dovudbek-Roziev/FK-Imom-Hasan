@@ -1,8 +1,8 @@
 const Player = require('../models/Player');
 const Training = require('../models/Training');
 const Payment = require('../models/Payment');
+const getMsg = require('../utils/messages');
 
-// Trener dashboard statistikasi
 const getDashboardStats = async (req, res) => {
   try {
     const coachId = req.coach._id;
@@ -10,10 +10,8 @@ const getDashboardStats = async (req, res) => {
     const month = now.getMonth() + 1;
     const year = now.getFullYear();
 
-    // Jami futbolchilar
     const totalPlayers = await Player.countDocuments({ coach: coachId, isActive: true });
 
-    // Bugungi trenirovka
     const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
     const todayEnd = new Date(now); todayEnd.setHours(23, 59, 59, 999);
     const todayTraining = await Training.findOne({
@@ -21,13 +19,11 @@ const getDashboardStats = async (req, res) => {
       date: { $gte: todayStart, $lte: todayEnd }
     });
 
-    // Joriy oy to'lovlari
     const payments = await Payment.find({ coach: coachId, month, year });
     const totalIncome = payments.filter(p => p.status === 'tolangan').reduce((sum, p) => sum + p.amount, 0);
     const totalDebt = payments.filter(p => p.status !== 'tolangan').reduce((sum, p) => sum + p.amount, 0);
     const debtorCount = payments.filter(p => p.status !== 'tolangan').length;
 
-    // Oxirgi 5 trenirovka
     const recentTrainings = await Training.find({ coach: coachId, status: 'tugallangan' })
       .sort({ date: -1 })
       .limit(5)
@@ -45,11 +41,10 @@ const getDashboardStats = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Jamoa umumiy statistikasi
 const getTeamStats = async (req, res) => {
   try {
     const coachId = req.coach._id;
@@ -57,17 +52,10 @@ const getTeamStats = async (req, res) => {
     const players = await Player.find({ coach: coachId, isActive: true })
       .select('firstName lastName stats position photo');
 
-    // Top golchilar
     const topScorers = [...players].sort((a, b) => b.stats.goals - a.stats.goals).slice(0, 5);
-
-    // Top assistent beruvchilar
     const topAssists = [...players].sort((a, b) => b.stats.assists - a.stats.assists).slice(0, 5);
-
-    // Eng ko'p kelgan
     const topAttendance = [...players].sort((a, b) => b.stats.trainingsAttended - a.stats.trainingsAttended).slice(0, 5);
 
-    // Oylik trenirovkalar soni
-    const now = new Date();
     const monthlyTrainings = await Training.aggregate([
       { $match: { coach: coachId, status: 'tugallangan' } },
       {
@@ -89,11 +77,10 @@ const getTeamStats = async (req, res) => {
       monthlyTrainings
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Oylik daromad grafigi
 const getIncomeStats = async (req, res) => {
   try {
     const coachId = req.coach._id;
@@ -113,11 +100,10 @@ const getIncomeStats = async (req, res) => {
 
     res.json({ success: true, monthlyIncome });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Futbolchi o'z statistikasini ko'rish
 const getMyStats = async (req, res) => {
   try {
     const player = await Player.findById(req.playerId)
@@ -125,10 +111,9 @@ const getMyStats = async (req, res) => {
       .populate('team', 'name color')
       .populate('coach', 'firstName lastName photo');
     if (!player) {
-      return res.status(404).json({ message: 'Futbolchi topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).playerNotFound });
     }
 
-    // Oxirgi 10 trenirovkadagi baholar grafigi uchun
     const trainings = await Training.find({
       'attendance.player': req.playerId,
       status: 'tugallangan'
@@ -166,11 +151,10 @@ const getMyStats = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Futbolchi uchun: o'z trenerining top futbolchilari
 const getTopPlayers = async (req, res) => {
   try {
     const players = await Player.find({ coach: req.coachId, isActive: true })
@@ -185,7 +169,7 @@ const getTopPlayers = async (req, res) => {
 
     res.json({ success: true, players: sorted });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 

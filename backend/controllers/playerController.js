@@ -1,7 +1,7 @@
 const Player = require('../models/Player');
 const Payment = require('../models/Payment');
+const getMsg = require('../utils/messages');
 
-// 6 xonali noyob kod generatsiya qilish
 const generateUniqueCode = async () => {
   let code;
   let exists = true;
@@ -12,7 +12,6 @@ const generateUniqueCode = async () => {
   return code;
 };
 
-// Barcha futbolchilarni olish
 const getPlayers = async (req, res) => {
   try {
     const players = await Player.find({
@@ -22,11 +21,10 @@ const getPlayers = async (req, res) => {
 
     res.json({ success: true, players, total: players.length });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Bitta futbolchi profili
 const getPlayer = async (req, res) => {
   try {
     const player = await Player.findOne({
@@ -35,21 +33,19 @@ const getPlayer = async (req, res) => {
     });
 
     if (!player) {
-      return res.status(404).json({ message: 'Futbolchi topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).playerNotFound });
     }
 
-    // To'lov ma'lumotlarini ham olib kelish
     const payments = await Payment.find({ player: player._id })
       .sort({ year: -1, month: -1 })
       .limit(12);
 
     res.json({ success: true, player, payments });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Yangi futbolchi qo'shish
 const addPlayer = async (req, res) => {
   try {
     const { firstName, lastName, dateOfBirth, position, notes, monthlyFee, paymentDueDay, team } = req.body;
@@ -70,7 +66,6 @@ const addPlayer = async (req, res) => {
 
     await player.save();
 
-    // Joriy oy uchun to'lov yozuvi yaratish
     if (monthlyFee) {
       const now = new Date();
       const dueDay = paymentDueDay || 5;
@@ -86,18 +81,12 @@ const addPlayer = async (req, res) => {
       });
     }
 
-    res.status(201).json({
-      success: true,
-      message: 'Futbolchi qo\'shildi.',
-      player,
-      accessCode
-    });
+    res.status(201).json({ success: true, player, accessCode });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.', error: error.message });
+    res.status(500).json({ message: getMsg(req.lang).serverError, error: error.message });
   }
 };
 
-// Futbolchi ma'lumotlarini yangilash
 const updatePlayer = async (req, res) => {
   try {
     const { firstName, lastName, dateOfBirth, position, healthStatus, notes, team } = req.body;
@@ -115,16 +104,15 @@ const updatePlayer = async (req, res) => {
     );
 
     if (!player) {
-      return res.status(404).json({ message: 'Futbolchi topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).playerNotFound });
     }
 
     res.json({ success: true, player });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Futbolchi statistikasini yangilash
 const updateStats = async (req, res) => {
   try {
     const { goals, assists, totalDistance } = req.body;
@@ -136,16 +124,15 @@ const updateStats = async (req, res) => {
     );
 
     if (!player) {
-      return res.status(404).json({ message: 'Futbolchi topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).playerNotFound });
     }
 
     res.json({ success: true, player });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Futbolchini o'chirish (soft delete)
 const deletePlayer = async (req, res) => {
   try {
     const player = await Player.findOneAndUpdate(
@@ -154,28 +141,27 @@ const deletePlayer = async (req, res) => {
     );
 
     if (!player) {
-      return res.status(404).json({ message: 'Futbolchi topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).playerNotFound });
     }
 
-    res.json({ success: true, message: 'Futbolchi o\'chirildi.' });
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Futbolchi o'z profilini ko'rish (6 xonali kod bilan kirgandan keyin)
 const getMyProfile = async (req, res) => {
   try {
     const player = await Player.findById(req.playerId)
       .populate('coach', 'firstName lastName photo');
 
     if (!player) {
-      return res.status(404).json({ message: 'Profil topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).profileNotFound });
     }
 
     res.json({ success: true, player });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 

@@ -2,8 +2,8 @@ const Coach = require('../models/Coach');
 const Player = require('../models/Player');
 const Subscription = require('../models/Subscription');
 const Payment = require('../models/Payment');
+const getMsg = require('../utils/messages');
 
-// Barcha trenerlar ro'yxati
 const getCoaches = async (req, res) => {
   try {
     const coaches = await Coach.find().select('-password').sort({ createdAt: -1 });
@@ -15,22 +15,22 @@ const getCoaches = async (req, res) => {
 
     res.json({ success: true, coaches: coachesWithStats, total: coaches.length });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Yangi trener yaratish (faqat admin)
 const createCoach = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
+    const m = getMsg(req.lang);
 
     if (!firstName || !lastName || !email || !password) {
-      return res.status(400).json({ message: 'Barcha maydonlar to\'ldirilishi shart.' });
+      return res.status(400).json({ message: m.allFieldsRequired });
     }
 
     const existing = await Coach.findOne({ email: email.toLowerCase() });
     if (existing) {
-      return res.status(400).json({ message: 'Bu email allaqachon ro\'yxatdan o\'tgan.' });
+      return res.status(400).json({ message: m.emailTaken });
     }
 
     const coach = new Coach({
@@ -45,7 +45,6 @@ const createCoach = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Trener yaratildi.',
       coach: {
         id: coach._id,
         firstName: coach.firstName,
@@ -54,42 +53,41 @@ const createCoach = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.', error: error.message });
+    res.status(500).json({ message: getMsg(req.lang).serverError, error: error.message });
   }
 };
 
-// Trener parolini yangilash
 const updateCoachPassword = async (req, res) => {
   try {
     const { newPassword } = req.body;
+    const m = getMsg(req.lang);
 
     if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ message: 'Parol kamida 6 ta belgi bo\'lishi shart.' });
+      return res.status(400).json({ message: m.passwordTooShortAdmin });
     }
 
     const coach = await Coach.findById(req.params.id);
 
     if (!coach) {
-      return res.status(404).json({ message: 'Trener topilmadi.' });
+      return res.status(404).json({ message: m.coachNotFound });
     }
 
     coach.password = newPassword;
     await coach.save();
 
-    res.json({ success: true, message: 'Parol yangilandi.' });
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Trenerga premium berish (qo'lda)
 const grantPremium = async (req, res) => {
   try {
     const { coachId, plan, months = 1 } = req.body;
 
     const coach = await Coach.findById(coachId);
     if (!coach) {
-      return res.status(404).json({ message: 'Trener topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).coachNotFound });
     }
 
     const startDate = new Date();
@@ -117,13 +115,12 @@ const grantPremium = async (req, res) => {
       status: 'active'
     });
 
-    res.json({ success: true, message: `${plan} berildi.`, coach });
+    res.json({ success: true, coach });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Trenerning premiumini bekor qilish
 const revokePremium = async (req, res) => {
   try {
     const coach = await Coach.findByIdAndUpdate(req.params.id, {
@@ -131,15 +128,14 @@ const revokePremium = async (req, res) => {
       'subscription.isActive': false
     });
 
-    if (!coach) return res.status(404).json({ message: 'Trener topilmadi.' });
+    if (!coach) return res.status(404).json({ message: getMsg(req.lang).coachNotFound });
 
-    res.json({ success: true, message: 'Premium bekor qilindi.' });
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Admin dashboard statistikasi
 const getAdminStats = async (req, res) => {
   try {
     const totalCoaches = await Coach.countDocuments();
@@ -174,40 +170,34 @@ const getAdminStats = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Trenerga bloklash / blokdan chiqarish
 const toggleCoachStatus = async (req, res) => {
   try {
     const coach = await Coach.findById(req.params.id);
     if (!coach) {
-      return res.status(404).json({ message: 'Trener topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).coachNotFound });
     }
 
     coach.isActive = !coach.isActive;
     await coach.save();
 
-    res.json({
-      success: true,
-      message: coach.isActive ? 'Trener faollashtirildi.' : 'Trener bloklandi.',
-      isActive: coach.isActive
-    });
+    res.json({ success: true, isActive: coach.isActive });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Trenerni o'chirish
 const deleteCoach = async (req, res) => {
   try {
     const coach = await Coach.findByIdAndDelete(req.params.id);
-    if (!coach) return res.status(404).json({ message: 'Trener topilmadi.' });
+    if (!coach) return res.status(404).json({ message: getMsg(req.lang).coachNotFound });
     await Player.deleteMany({ coach: req.params.id });
-    res.json({ success: true, message: 'Trener o\'chirildi.' });
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 

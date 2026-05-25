@@ -1,7 +1,7 @@
 const Training = require('../models/Training');
 const Player = require('../models/Player');
+const getMsg = require('../utils/messages');
 
-// Barcha trenirovkalarni olish
 const getTrainings = async (req, res) => {
   try {
     const { page = 1, limit = 20, status, team } = req.query;
@@ -20,27 +20,25 @@ const getTrainings = async (req, res) => {
 
     res.json({ success: true, trainings, total, pages: Math.ceil(total / limit) });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Bitta trenirovka
 const getTraining = async (req, res) => {
   try {
     const training = await Training.findOne({ _id: req.params.id, coach: req.coach._id })
       .populate('attendance.player', 'firstName lastName photo position');
 
     if (!training) {
-      return res.status(404).json({ message: 'Trenirovka topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).trainingNotFound });
     }
 
     res.json({ success: true, training });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Yangi trenirovka yaratish
 const createTraining = async (req, res) => {
   try {
     const { title, date, days, startTime, endTime, location, exercises, notes, team } = req.body;
@@ -74,7 +72,6 @@ const createTraining = async (req, res) => {
 
     await training.save();
 
-    // Shu futbolchilar uchun totalTrainings +1
     await Player.updateMany(
       playerFilter,
       { $inc: { 'stats.totalTrainings': 1 } }
@@ -82,21 +79,19 @@ const createTraining = async (req, res) => {
 
     res.status(201).json({ success: true, training });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.', error: error.message });
+    res.status(500).json({ message: getMsg(req.lang).serverError, error: error.message });
   }
 };
 
-// Trenirovkani yangilash (davomat, baholar)
 const updateTraining = async (req, res) => {
   try {
     const { title, date, days, startTime, endTime, location, exercises, attendance, status, notes, team } = req.body;
 
     const training = await Training.findOne({ _id: req.params.id, coach: req.coach._id });
     if (!training) {
-      return res.status(404).json({ message: 'Trenirovka topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).trainingNotFound });
     }
 
-    // Davomat yangilanganda futbolchi statistikasini ham yangilash
     if (attendance && training.status !== 'tugallangan' && status === 'tugallangan') {
       for (const att of attendance) {
         const updateData = {};
@@ -124,26 +119,24 @@ const updateTraining = async (req, res) => {
 
     res.json({ success: true, training: updated });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Trenirovkani o'chirish
 const deleteTraining = async (req, res) => {
   try {
     const training = await Training.findOneAndDelete({ _id: req.params.id, coach: req.coach._id });
 
     if (!training) {
-      return res.status(404).json({ message: 'Trenirovka topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).trainingNotFound });
     }
 
-    res.json({ success: true, message: 'Trenirovka o\'chirildi.' });
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Futbolchi o'z trenirovkalarini ko'rish
 const getMyTrainings = async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
@@ -157,7 +150,6 @@ const getMyTrainings = async (req, res) => {
       .skip((page - 1) * limit)
       .select('title date startTime location attendance status');
 
-    // Faqat shu futbolchi ma'lumotlarini qaytarish
     const myTrainings = trainings.map(t => {
       const myAtt = t.attendance.find(a => a.player.toString() === req.playerId);
       return {
@@ -172,36 +164,77 @@ const getMyTrainings = async (req, res) => {
 
     res.json({ success: true, trainings: myTrainings });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Kelgusi trenirovkalar (futbolchi uchun)
 const getUpcomingTrainings = async (req, res) => {
   try {
-    const todayStart = new Date();
-    todayStart.setUTCHours(0, 0, 0, 0);
+    if (!req.coachId) return res.json({ success: true, trainings: [] });
 
     const trainings = await Training.find({
       coach: req.coachId,
       status: 'rejalashtirilgan',
-      $or: [
-        { date: { $gte: todayStart } },
-        { days: { $exists: true, $ne: [] } }
-      ]
+      'attendance.player': req.playerId,
     })
       .sort({ createdAt: -1 })
-      .limit(10)
-      .select('title date days startTime endTime location team')
+      .limit(20)
+      .select('title date days startTime endTime location team attendance')
       .populate('team', 'name color');
 
-    res.json({ success: true, trainings });
+    const result = trainings.map(t => {
+      const myAtt = t.attendance.find(a => a.player.toString() === req.playerId.toString());
+      return {
+        _id: t._id,
+        title: t.title,
+        date: t.date,
+        days: t.days,
+        startTime: t.startTime,
+        endTime: t.endTime,
+        location: t.location,
+        team: t.team,
+        myResponse: myAtt?.playerResponse || null,
+      };
+    });
+
+    res.json({ success: true, trainings: result });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    console.error('getUpcomingTrainings xatosi:', error);
+    res.status(500).json({ message: getMsg(req.lang).serverError, error: error.message });
+  }
+};
+
+const rsvpTraining = async (req, res) => {
+  try {
+    const { response } = req.body;
+    if (!['kelaman', 'kelmayman'].includes(response)) {
+      return res.status(400).json({ message: getMsg(req.lang).serverError });
+    }
+
+    const training = await Training.findOne({
+      _id: req.params.id,
+      status: 'rejalashtirilgan',
+    });
+
+    if (!training) {
+      return res.status(404).json({ message: getMsg(req.lang).trainingNotFound });
+    }
+
+    const att = training.attendance.find(a => a.player.toString() === req.playerId.toString());
+    if (!att) {
+      return res.status(404).json({ message: getMsg(req.lang).trainingNotFound });
+    }
+
+    att.playerResponse = response;
+    await training.save();
+
+    res.json({ success: true, playerResponse: response });
+  } catch (error) {
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
 module.exports = {
   getTrainings, getTraining, createTraining,
-  updateTraining, deleteTraining, getMyTrainings, getUpcomingTrainings
+  updateTraining, deleteTraining, getMyTrainings, getUpcomingTrainings, rsvpTraining
 };

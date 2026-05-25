@@ -2,8 +2,8 @@ const Payment = require('../models/Payment');
 const Player = require('../models/Player');
 const Coach = require('../models/Coach');
 const { sendNotification } = require('./notificationController');
+const getMsg = require('../utils/messages');
 
-// Barcha to'lovlarni olish (trener uchun)
 const getPayments = async (req, res) => {
   try {
     const { month, year, status } = req.query;
@@ -19,7 +19,6 @@ const getPayments = async (req, res) => {
       .populate('player', 'firstName lastName photo position')
       .sort({ status: 1 });
 
-    // Statistika
     const totalAmount = payments.reduce((sum, p) => sum + p.amount, 0);
     const paidAmount = payments.filter(p => p.status === 'tolangan').reduce((sum, p) => sum + p.amount, 0);
     const debtAmount = totalAmount - paidAmount;
@@ -37,18 +36,17 @@ const getPayments = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Oylik to'lov summasi belgilash / yangilash
 const setMonthlyFee = async (req, res) => {
   try {
     const { playerId, amount, month, year, dueDay = 5 } = req.body;
 
     const player = await Player.findOne({ _id: playerId, coach: req.coach._id });
     if (!player) {
-      return res.status(404).json({ message: 'Futbolchi topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).playerNotFound });
     }
 
     const dueDate = new Date(year, month - 1, dueDay);
@@ -61,11 +59,10 @@ const setMonthlyFee = async (req, res) => {
 
     res.json({ success: true, payment });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// To'lovni tasdiqlash (trener tomonidan)
 const confirmPayment = async (req, res) => {
   try {
     const { paymentMethod, transactionId, notes } = req.body;
@@ -83,10 +80,9 @@ const confirmPayment = async (req, res) => {
     ).populate('player', 'firstName lastName fcmToken');
 
     if (!payment) {
-      return res.status(404).json({ message: 'To\'lov topilmadi.' });
+      return res.status(404).json({ message: getMsg(req.lang).paymentNotFound });
     }
 
-    // Futbolchiga bildirishnoma
     if (payment.player.fcmToken) {
       await sendNotification(
         payment.player.fcmToken,
@@ -97,14 +93,14 @@ const confirmPayment = async (req, res) => {
 
     res.json({ success: true, payment });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Futbolchi to'lov qilganligini bildirishi (trener tasdiqlashi kerak)
 const makePayment = async (req, res) => {
   try {
     const { paymentId } = req.body;
+    const m = getMsg(req.lang);
 
     const payment = await Payment.findOne({
       _id: paymentId,
@@ -112,22 +108,20 @@ const makePayment = async (req, res) => {
     }).populate('coach', 'firstName lastName fcmToken');
 
     if (!payment) {
-      return res.status(404).json({ message: 'To\'lov topilmadi.' });
+      return res.status(404).json({ message: m.paymentNotFound });
     }
 
     if (payment.status === 'tolangan') {
-      return res.status(400).json({ message: 'Bu to\'lov allaqachon to\'langan.' });
+      return res.status(400).json({ message: m.paymentAlreadyPaid });
     }
 
     if (payment.notes === 'player_notified') {
-      return res.status(400).json({ message: 'Trenerga allaqachon xabar yuborildi. Tasdiqlashini kuting.' });
+      return res.status(400).json({ message: m.paymentAlreadyNotified });
     }
 
-    // Faqat xabar belgisi qo'yamiz — trener o'zi tasdiqlashi kerak
     payment.notes = 'player_notified';
     await payment.save();
 
-    // Trenerga bildirishnoma
     const player = await Player.findById(req.playerId);
     if (payment.coach?.fcmToken && player) {
       await sendNotification(
@@ -139,18 +133,17 @@ const makePayment = async (req, res) => {
 
     res.json({ success: true, payment });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Futbolchiga eslatma yuborish
 const sendReminder = async (req, res) => {
   try {
     const { playerId } = req.body;
 
     const player = await Player.findOne({ _id: playerId, coach: req.coach._id });
     if (!player || !player.fcmToken) {
-      return res.status(404).json({ message: 'Futbolchi topilmadi yoki token yo\'q.' });
+      return res.status(404).json({ message: getMsg(req.lang).playerNotFoundOrNoToken });
     }
 
     const unpaidPayments = await Payment.find({
@@ -166,13 +159,12 @@ const sendReminder = async (req, res) => {
       `Hurmatli ${player.firstName}, ${totalDebt.toLocaleString()} so\'m to\'lovingiz kutmoqda.`
     );
 
-    res.json({ success: true, message: 'Eslatma yuborildi.' });
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Kechikkan to'lovlarni avtomatik tekshirish (cron job)
 const checkOverduePayments = async () => {
   try {
     const now = new Date();
@@ -182,14 +174,12 @@ const checkOverduePayments = async () => {
       { status: 'kechikkan' }
     );
 
-    // Kechikkan futbolchilarga bildirishnoma
     const overduePayments = await Payment.find({ status: 'kechikkan' })
       .populate('player', 'firstName lastName fcmToken')
       .populate('coach', 'fcmToken');
 
     for (const payment of overduePayments) {
       const daysDiff = Math.floor((now - payment.dueDate) / (1000 * 60 * 60 * 24));
-      // Faqat 1, 3, 7, 14, 30 kunlarda bildirishnoma yuborish (spam oldini olish)
       const notifyDays = [1, 3, 7, 14, 30];
       if (payment.player.fcmToken && notifyDays.includes(daysDiff)) {
         await sendNotification(
@@ -204,7 +194,6 @@ const checkOverduePayments = async () => {
   }
 };
 
-// Futbolchi o'z to'lovlarini ko'rish
 const getMyPayments = async (req, res) => {
   try {
     const payments = await Payment.find({ player: req.playerId })
@@ -216,39 +205,37 @@ const getMyPayments = async (req, res) => {
 
     res.json({ success: true, payments, totalDebt });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Barcha futbolchilar uchun bir oylik to'lovni belgilash
 const setFeeForAll = async (req, res) => {
   try {
     const { amount, month, year } = req.body;
     const coachId = req.coach._id;
+    const m = getMsg(req.lang);
     const now = new Date();
-    const m = Number(month) || (now.getMonth() + 1);
+    const mo = Number(month) || (now.getMonth() + 1);
     const y = Number(year) || now.getFullYear();
     const amt = Number(amount);
 
     if (!amt || amt <= 0) {
-      return res.status(400).json({ message: "To'lov miqdori kiritilishi shart." });
+      return res.status(400).json({ message: m.amountRequired });
     }
 
     const players = await Player.find({ coach: coachId, isActive: true });
     if (!players.length) {
-      return res.status(400).json({ message: 'Aktiv futbolchilar topilmadi.' });
+      return res.status(400).json({ message: m.noActivePlayers });
     }
 
-    const dueDate = new Date(y, m - 1, 5);
+    const dueDate = new Date(y, mo - 1, 5);
 
-    // Har bir futbolchi uchun upsert: yangi yozuv yaratilsa status='tolmagan',
-    // mavjud bo'lsa faqat amount va dueDate yangilanadi (status o'zgarmaydi)
     const ops = players.map(p => ({
       updateOne: {
-        filter: { player: p._id, month: m, year: y, coach: coachId },
+        filter: { player: p._id, month: mo, year: y, coach: coachId },
         update: {
           $set: { amount: amt, dueDate },
-          $setOnInsert: { player: p._id, month: m, year: y, coach: coachId, status: 'tolmagan' }
+          $setOnInsert: { player: p._id, month: mo, year: y, coach: coachId, status: 'tolmagan' }
         },
         upsert: true
       }
@@ -259,19 +246,18 @@ const setFeeForAll = async (req, res) => {
 
     res.json({ success: true, count: players.length });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.', error: error.message });
+    res.status(500).json({ message: getMsg(req.lang).serverError, error: error.message });
   }
 };
 
-// Futbolchi uchun: o'z trenerining karta va WhatsApp ma'lumotlari
 const getCoachPaymentInfo = async (req, res) => {
   try {
     const coach = await Coach.findById(req.coachId)
       .select('firstName lastName cardNumber whatsappNumber monthlyFee');
-    if (!coach) return res.status(404).json({ message: 'Trener topilmadi.' });
+    if (!coach) return res.status(404).json({ message: getMsg(req.lang).coachNotFound });
     res.json({ success: true, coach });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 

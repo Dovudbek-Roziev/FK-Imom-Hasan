@@ -1,23 +1,23 @@
 const jwt = require('jsonwebtoken');
 const Coach = require('../models/Coach');
 const Player = require('../models/Player');
+const getMsg = require('../utils/messages');
 
-// JWT token yaratish
 const generateToken = (id, role, extra = {}) => {
   return jwt.sign({ id, role, ...extra }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE || '7d'
   });
 };
 
-// Trener login
 const coachLogin = async (req, res) => {
   console.log('Coach login boshlandi');
   try {
     const { email, password } = req.body;
+    const m = getMsg(req.lang);
     console.log('Email:', email, 'Password bor:', !!password);
 
     if (!email || !password) {
-      return res.status(400).json({ message: 'Email va parol kiritish shart.' });
+      return res.status(400).json({ message: m.emailPasswordRequired });
     }
 
     console.log('DB dan trener qidirilmoqda...');
@@ -25,7 +25,7 @@ const coachLogin = async (req, res) => {
     console.log('Trener topildimi:', !!coach);
 
     if (!coach) {
-      return res.status(401).json({ message: 'Email yoki parol noto\'g\'ri.' });
+      return res.status(401).json({ message: m.invalidCredentials });
     }
 
     console.log('Parol tekshirilmoqda...');
@@ -33,7 +33,7 @@ const coachLogin = async (req, res) => {
     console.log('Parol to\'g\'rimi:', isMatch);
 
     if (!isMatch) {
-      return res.status(401).json({ message: 'Email yoki parol noto\'g\'ri.' });
+      return res.status(401).json({ message: m.invalidCredentials });
     }
 
     console.log('Token yaratilmoqda...');
@@ -54,24 +54,24 @@ const coachLogin = async (req, res) => {
     });
   } catch (error) {
     console.error('Coach login xatosi:', error.message, error.stack);
-    res.status(500).json({ message: 'Server xatosi.', error: error.message });
+    res.status(500).json({ message: getMsg(req.lang).serverError, error: error.message });
   }
 };
 
-// Futbolchi login — 6 xonali kod bilan
 const playerLogin = async (req, res) => {
   try {
     const { accessCode } = req.body;
+    const m = getMsg(req.lang);
 
     if (!accessCode || accessCode.length !== 6) {
-      return res.status(400).json({ message: '6 xonali kod kiritish shart.' });
+      return res.status(400).json({ message: m.accessCodeRequired });
     }
 
     const player = await Player.findOne({ accessCode, isActive: true })
       .populate('coach', 'firstName lastName photo')
       .populate('team', 'name color');
     if (!player) {
-      return res.status(401).json({ message: 'Noto\'g\'ri kod. Treneringizdan oling.' });
+      return res.status(401).json({ message: m.invalidAccessCode });
     }
 
     const token = generateToken(player._id, 'player', { coachId: player.coach._id });
@@ -93,18 +93,18 @@ const playerLogin = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.', error: error.message });
+    res.status(500).json({ message: getMsg(req.lang).serverError, error: error.message });
   }
 };
 
-// FCM token yangilash (push notification uchun)
 const updateFcmToken = async (req, res) => {
   try {
     const { fcmToken } = req.body;
-    if (!fcmToken) return res.status(400).json({ message: 'FCM token kerak.' });
+    const m = getMsg(req.lang);
+    if (!fcmToken) return res.status(400).json({ message: m.fcmTokenRequired });
 
     const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ message: 'Token topilmadi.' });
+    if (!authHeader) return res.status(401).json({ message: m.tokenRequiredShort });
 
     const decoded = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
 
@@ -116,53 +116,51 @@ const updateFcmToken = async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
+    const m = getMsg(req.lang);
     if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Token noto\'g\'ri.' });
+      return res.status(401).json({ message: m.tokenInvalidShort });
     }
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: m.serverError });
   }
 };
 
-// Trener parolini o'zgartirish
 const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
+    const m = getMsg(req.lang);
 
     if (!currentPassword || !newPassword) {
-      return res.status(400).json({ message: 'Joriy va yangi parol kiritilishi shart.' });
+      return res.status(400).json({ message: m.passwordRequired });
     }
     if (newPassword.length < 6) {
-      return res.status(400).json({ message: "Yangi parol kamida 6 ta belgi bo'lishi kerak." });
+      return res.status(400).json({ message: m.passwordTooShort });
     }
 
     const coach = await Coach.findById(req.coach._id);
     const isMatch = await coach.comparePassword(currentPassword);
     if (!isMatch) {
-      return res.status(400).json({ message: "Joriy parol noto'g'ri." });
+      return res.status(400).json({ message: m.currentPasswordWrong });
     }
 
     coach.password = newPassword;
     await coach.save();
 
-    res.json({ success: true, message: "Parol muvaffaqiyatli o'zgartirildi." });
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Trener o'z profilini olish (karta, WhatsApp ma'lumotlari bilan)
 const getCoachProfile = async (req, res) => {
   try {
-    const coach = await Coach.findById(req.coach._id)
-      .select('-password -fcmToken');
-    if (!coach) return res.status(404).json({ message: 'Topilmadi.' });
+    const coach = await Coach.findById(req.coach._id).select('-password -fcmToken');
+    if (!coach) return res.status(404).json({ message: getMsg(req.lang).notFound });
     res.json({ success: true, coach });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
-// Trener to'lov ma'lumotlarini yangilash (karta, WhatsApp, oylik fee)
 const updatePaymentInfo = async (req, res) => {
   try {
     const { cardNumber, whatsappNumber, monthlyFee } = req.body;
@@ -173,7 +171,7 @@ const updatePaymentInfo = async (req, res) => {
     });
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 

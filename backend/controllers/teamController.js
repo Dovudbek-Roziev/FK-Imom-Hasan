@@ -1,5 +1,6 @@
 const Team = require('../models/Team');
 const Player = require('../models/Player');
+const getMsg = require('../utils/messages');
 
 const getTeams = async (req, res) => {
   try {
@@ -20,14 +21,14 @@ const getTeams = async (req, res) => {
 
     res.json({ teams: result });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
 const addTeam = async (req, res) => {
   try {
     const { name, description, color } = req.body;
-    if (!name?.trim()) return res.status(400).json({ message: 'Jamoa nomi kiritilishi shart.' });
+    if (!name?.trim()) return res.status(400).json({ message: getMsg(req.lang).teamNameRequired });
 
     const team = await Team.create({
       name: name.trim(),
@@ -38,61 +39,62 @@ const addTeam = async (req, res) => {
 
     res.status(201).json({ team });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
 const updateTeam = async (req, res) => {
   try {
     const { name, description, color } = req.body;
-    if (!name?.trim()) return res.status(400).json({ message: 'Jamoa nomi kiritilishi shart.' });
+    if (!name?.trim()) return res.status(400).json({ message: getMsg(req.lang).teamNameRequired });
 
     const team = await Team.findOneAndUpdate(
       { _id: req.params.id, coach: req.coach._id },
       { name: name.trim(), description, color },
       { new: true }
     );
-    if (!team) return res.status(404).json({ message: 'Jamoa topilmadi.' });
+    if (!team) return res.status(404).json({ message: getMsg(req.lang).teamNotFound });
 
     res.json({ team });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
 const deleteTeam = async (req, res) => {
   try {
     const team = await Team.findOne({ _id: req.params.id, coach: req.coach._id });
-    if (!team) return res.status(404).json({ message: 'Jamoa topilmadi.' });
+    if (!team) return res.status(404).json({ message: getMsg(req.lang).teamNotFound });
 
     await Player.updateMany({ team: team._id }, { $set: { team: null } });
     await Team.deleteOne({ _id: team._id });
 
-    res.json({ message: "Jamoa o'chirildi." });
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
 const assignPlayer = async (req, res) => {
   try {
     const { playerId, teamId } = req.body;
+    const m = getMsg(req.lang);
 
     const player = await Player.findOne({ _id: playerId, coach: req.coach._id, isActive: true });
-    if (!player) return res.status(404).json({ message: 'Futbolchi topilmadi.' });
+    if (!player) return res.status(404).json({ message: m.playerNotFound });
 
     if (teamId) {
       const team = await Team.findOne({ _id: teamId, coach: req.coach._id });
-      if (!team) return res.status(404).json({ message: 'Jamoa topilmadi.' });
+      if (!team) return res.status(404).json({ message: m.teamNotFound });
       player.team = teamId;
     } else {
       player.team = null;
     }
 
     await player.save();
-    res.json({ message: 'Futbolchi yangilandi.' });
+    res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ message: 'Server xatosi.' });
+    res.status(500).json({ message: getMsg(req.lang).serverError });
   }
 };
 
