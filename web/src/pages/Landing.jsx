@@ -342,11 +342,19 @@ export default function Landing() {
   const [v, setV] = useState(false);
   const [dark, setDark] = useState(true);
   const [lang, setLang] = useState('uz');
+  const [publicStats, setPublicStats] = useState(null);
   const t = translations[lang];
 
   useEffect(() => {
     const t = setTimeout(() => setV(true), 80);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    fetch('https://fk-imom-hasan.onrender.com/api/stats/public')
+      .then(r => r.json())
+      .then(d => setPublicStats(d))
+      .catch(() => {});
   }, []);
 
   return (
@@ -545,12 +553,16 @@ export default function Landing() {
 
           {/* Stats */}
           <div className={`mt-10 sm:mt-16 grid grid-cols-3 gap-4 sm:gap-20 transition-all duration-700 delay-[600ms] ${v ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            {[50, 200, 10].map((target, i) => (
+            {[
+              { key: 'players', label: t.statLabels[0] },
+              { key: 'trainings', label: t.statLabels[1] },
+              { key: 'coaches', label: t.statLabels[2] },
+            ].map(({ key, label }, i) => (
               <div key={i} className="text-center">
                 <p className={`text-2xl sm:text-5xl font-black tabular-nums ${dark ? 'text-white' : 'text-slate-800'}`}>
-                  <Counter target={target} suffix="+" />
+                  {publicStats ? <Counter target={publicStats[key] || 0} /> : '—'}
                 </p>
-                <p className={`text-[10px] sm:text-sm mt-1 font-medium ${dark ? 'text-slate-500' : 'text-slate-400'}`}>{t.statLabels[i]}</p>
+                <p className={`text-[10px] sm:text-sm mt-1 font-medium ${dark ? 'text-slate-500' : 'text-slate-400'}`}>{label}</p>
               </div>
             ))}
           </div>
