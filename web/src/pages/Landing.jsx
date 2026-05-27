@@ -351,7 +351,8 @@ export default function Landing() {
   }, []);
 
   useEffect(() => {
-    fetch('https://fk-imom-hasan.onrender.com/api/stats/public')
+    const base = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api', '');
+    fetch(`${base}/api/stats/public`)
       .then(r => r.json())
       .then(d => setPublicStats(d))
       .catch(() => {});
